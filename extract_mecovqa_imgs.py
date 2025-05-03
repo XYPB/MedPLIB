@@ -12,15 +12,30 @@ CHUNK      = 4 << 20                      # 1 MiB per read – tune as you lik
 IMG_EXTS   = {".jpg", ".jpeg", ".png", ".gif",
               ".bmp", ".tif", ".tiff", ".webp"}
 
-def upper_bound(prefix):
-    # any string that is *just after* all strings beginning with prefix
-    # trick: append a Unicode code‑point larger than any real character
-    return prefix[:-1] + chr(ord(prefix[-1]) + 1) if prefix else chr(0x10FFFF)
+def prefix_sweep(names, prefixes):
+    """
+    names      - iterable of strings
+    prefixes   - iterable of strings
+    Return dict{prefix → list_of_names_starting_with_it}
+    """
+    names_sorted  = sorted(names)
+    pref_sorted   = sorted([(p, i) for i, p in enumerate(prefixes)])
+    result        = [[] for _ in prefixes]
 
-def find_with_prefix(names_sorted, prefix):
-    lo = bisect.bisect_left(names_sorted, prefix)
-    hi = bisect.bisect_left(names_sorted, upper_bound(prefix))
-    return names_sorted[lo:hi]
+    n_idx = 0
+    for p, orig_idx in pref_sorted:
+        # advance n_idx to first name ≥ p
+        while n_idx < len(names_sorted) and names_sorted[n_idx] < p:
+            n_idx += 1
+
+        # collect while name starts with p
+        j = n_idx
+        m = names_sorted
+        while j < len(m) and m[j].startswith(p):
+            result[orig_idx].append(m[j])
+            j += 1
+
+    return {p: result[i] for i, p in enumerate(prefixes)}
 
 def get_all_required_images():
     target_json = glob("./data/MeCoVQA/*/*.json")
@@ -40,14 +55,11 @@ def get_mask_query(image_list):
 def get_all_required_masks(zf_list, image_list):
     query_prefix = get_mask_query(image_list)
     zf_list_sorted = sorted(zf_list)
-    required_masks = find_with_prefix(zf_list_sorted, query_prefix)
+    required_masks = prefix_sweep(zf_list_sorted, query_prefix)
     print(f"Total number of required masks: {len(required_masks)}")
     print(f"Required masks: {required_masks[:10]}")
     return required_masks
 
-
-def merge_masks():
-    pass
 
 if __name__ == "__main__":
     OUT_DIR.mkdir(parents=True, exist_ok=True)
