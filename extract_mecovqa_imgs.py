@@ -57,7 +57,7 @@ def get_all_required_masks(zf_list, image_list):
     zf_list_sorted = sorted(zf_list)
     required_masks = prefix_sweep(zf_list_sorted, query_prefix)
     print(f"Total number of required masks: {len(required_masks)}")
-    print(f"Required masks: {required_masks[:10]}")
+    print(f"Required masks: {required_masks[query_prefix[0]]}")
     return required_masks
 
 
