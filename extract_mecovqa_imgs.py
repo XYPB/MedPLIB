@@ -43,7 +43,9 @@ if __name__ == "__main__":
     with zipfile.ZipFile(ZIP_PATH) as zf:
         # get directory tree
         zf_list = zf.namelist()
-            # extract the image
+        print(f"Total number of files in zip: {len(zf_list)}")
+        print(f"First 10 files in zip: {zf_list[:10]}")
+        # extract the image
         for image_path in tqdm(required_images):
             try:
                 # Extract the image from the zip file
