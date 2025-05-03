@@ -61,8 +61,9 @@ if __name__ == "__main__":
     required_masks = get_all_required_masks(required_images)
     print(f"Total number of required images: {len(required_images)}")
     print(f"Total number of required masks: {len(required_masks)}")
-    total_images = required_images + required_masks
+    total_images = sorted(required_images + required_masks)
     print(f"Total number of images to extract: {len(total_images)}")
+    total_images = total_images[:64]
     
     # Determine number of CPU cores to use
     num_cores = mp.cpu_count()
