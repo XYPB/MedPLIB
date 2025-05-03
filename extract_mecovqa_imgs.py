@@ -65,7 +65,7 @@ def get_all_required_masks_parallel(zf_list, image_list):
     # use get_all_required_masks function to get the required masks in a multi-process way
     from multiprocessing import Pool
     from functools import partial
-    N = 8
+    N = 4
     # chunk the image_list into N chunks
     chunk_size = len(image_list) // N
     chunks = [image_list[i:i + chunk_size] for i in range(0, len(image_list), chunk_size)]
@@ -81,6 +81,9 @@ def get_all_required_masks_parallel(zf_list, image_list):
                     required_masks[k].extend(v)
                 else:
                     required_masks[k] = v
+    print(f"Total number of required masks: {len(required_masks)}")
+    print(f"Required masks: {required_masks}")
+    return required_masks
 
 
 if __name__ == "__main__":
@@ -94,6 +97,7 @@ if __name__ == "__main__":
         print(f"Total number of files in zip: {len(zf_list)}")
         # get all required masks
         required_masks = get_all_required_masks(zf_list, required_images[:2])
+        required_masks = get_all_required_masks_parallel(zf_list, required_images[:16])
         # extract the image
         for image_path in tqdm(required_images):
             try:
