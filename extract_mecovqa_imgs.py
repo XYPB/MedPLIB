@@ -52,7 +52,8 @@ if __name__ == "__main__":
         print(f"Total number of files in zip: {len(zf_list)}")
         # get all required masks
         # extract the image
-        for idx, image_path in tqdm(enumerate(required_images + required_masks)):
+        total = len(required_images + required_masks)
+        for idx, image_path in tqdm(enumerate(required_images + required_masks), total=total):
             try:
                 # Extract the image from the zip file
                 zf.extract(image_path, OUT_DIR)

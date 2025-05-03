@@ -12,3 +12,4 @@ serve_logs
 serve_images/*
 
 data/
+tmp/
