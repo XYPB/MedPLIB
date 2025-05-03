@@ -13,14 +13,14 @@ IMG_EXTS   = {".jpg", ".jpeg", ".png", ".gif",
 
 def get_all_required_images():
     target_json = glob("./data/MeCoVQA/*/*.json")
-    all_images = set(['SAMed2D_v1_class_mapping_id.json', 'SAMed2D_v1.json'])
+    all_images = set(['SAMed2Dv1/SAMed2D_v1_class_mapping_id.json', 'SAMed2Dv1/SAMed2D_v1.json'])
     for json_file in target_json:
         with open(json_file, 'r') as f:
             data = json.load(f)
             for item in data:
                 image_path = item['image']
                 if image_path.startswith('images/'):
-                    all_images.add(image_path)
+                    all_images.add('SAMed2Dv1/' + image_path)
                 # conversation = item['conversations']
                 # for conv in conversation:
                 #     ans_value = conv['value']
@@ -40,13 +40,11 @@ if __name__ == "__main__":
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     required_images = get_all_required_images()
-    print(required_images[-100:])
     print(f"Total number of required images: {len(required_images)}")
     with zipfile.ZipFile(ZIP_PATH) as zf:
         # get directory tree
         zf_list = zf.namelist()
         print(f"Total number of files in zip: {len(zf_list)}")
-        print(f"First 10 files in zip: {zf_list[:10]}")
         # extract the image
         for image_path in tqdm(required_images):
             try:
