@@ -39,6 +39,7 @@ if __name__ == "__main__":
     OUT_DIR.mkdir(parents=True, exist_ok=True)
 
     required_images = get_all_required_images()
+    print(required_images[:100])
     print(f"Total number of required images: {len(required_images)}")
     with zipfile.ZipFile(ZIP_PATH) as zf:
         # get directory tree
