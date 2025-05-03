@@ -5,6 +5,7 @@ from PIL import Image
 from tqdm import tqdm
 from glob import glob
 from pathlib import Path
+import multiprocessing as mp
 
 JSON_PATH = Path('/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/SAMed2D_v1.json')
 LOCAL_IMAGE_DIR = Path('/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/images')
@@ -31,8 +32,7 @@ def merge_masks(mask_list):
     
     # remove keys with only one value
     mask_cls2idx_dict = {k: v for k, v in mask_cls2idx_dict.items() if len(v) > 1}
-    
-    
+
     for cls in mask_cls2idx_dict.keys():
         merged_mask = None
         for idx in mask_cls2idx_dict[cls]:
@@ -44,21 +44,55 @@ def merge_masks(mask_list):
             # Open the mask image
             mask_image = Image.open(mask_path).convert("L")
             mask_array = np.array(mask_image)
+            if mask_image.max() > 1:
+                mask_array = mask_array // 255
+            mask_array = mask_array.astype(np.uint8)
 
             if merged_mask is None:
                 merged_mask = np.zeros_like(mask_array)
             
             merged_mask = np.bitwise_or(merged_mask, mask_array)
+        if merged_mask is None:
+            print(f"No valid masks found for {base_mask_name}---{cls}.")
+            continue
         output_path = os.path.join(OUTPUT_DIR, f"{base_mask_name}---{cls}_merged.png")
+        if merged_mask.max() <= 1.0:
+            merged_mask = merged_mask * 255
+        merged_mask = merged_mask.astype(np.uint8)
         Image.fromarray(merged_mask).save(output_path)
 
 
+def process_image_chunk(chunk_data):
+    """
+    Process a chunk of images
+    
+    Args:
+        chunk_data (tuple): Tuple containing (chunk of image paths, image2mask dictionary)
+    """
+    image_chunk, image2mask = chunk_data
+    for image_path in tqdm(image_chunk, total=len(image_chunk), desc="Processing images"):
+        mask_list = image2mask.get(image_path.replace('images/', ''), [])
+        merge_masks(mask_list)
+    return len(image_chunk)
+
+
 if __name__ == "__main__":
-    # Example usage
+    # Load data
     image_list = glob(os.path.join(LOCAL_IMAGE_DIR, '*.png'))
     image2mask = json.load(open(JSON_PATH, 'r'))
     
-    for image_path in tqdm(image_list):
-        mask_list = image2mask.get(image_path.replace('images/', ''), [])
-        merge_masks(mask_list)
+    # Determine number of processes and chunk size
+    num_processes = mp.cpu_count()
+    chunk_size = max(1, len(image_list) // num_processes)
     
+    # Split images into chunks
+    image_chunks = [image_list[i:i + chunk_size] for i in range(0, len(image_list), chunk_size)]
+    chunk_args = [(chunk, image2mask) for chunk in image_chunks]
+    
+    print(f"Processing {len(image_list)} images using {num_processes} processes in {len(image_chunks)} chunks")
+    
+    # Create multiprocessing pool and process chunks
+    with mp.Pool(processes=num_processes) as pool:
+        results = pool.map(process_image_chunk, chunk_args)
+    
+    print(f"Completed processing {sum(results)} images")
