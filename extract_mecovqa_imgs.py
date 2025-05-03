@@ -19,7 +19,8 @@ def get_all_required_images():
             data = json.load(f)
             for item in data:
                 image_path = item['image']
-                all_images.add(image_path)
+                if image_path.startswith('images/'):
+                    all_images.add(image_path)
                 # conversation = item['conversations']
                 # for conv in conversation:
                 #     ans_value = conv['value']
