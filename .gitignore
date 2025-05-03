@@ -10,3 +10,5 @@ projector.log
 # scripts/
 serve_logs
 serve_images/*
+
+data/
