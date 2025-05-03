@@ -50,7 +50,7 @@ def get_all_required_images():
     return sorted(list(all_images))
 
 def get_mask_query(image_list):
-    return [p.replace('images/', 'masks/').replace('.png', '') for p in image_list]
+    return [p.replace('images/', 'masks/').replace('.png', '') for p in image_list  if 'json' not in p]
 
 def get_all_required_masks(zf_list, image_list):
     query_prefix = get_mask_query(image_list)
@@ -59,6 +59,28 @@ def get_all_required_masks(zf_list, image_list):
     print(f"Total number of required masks: {len(required_masks)}")
     print(f"Required masks: {required_masks[query_prefix[0]]}")
     return required_masks
+
+
+def get_all_required_masks_parallel(zf_list, image_list):
+    # use get_all_required_masks function to get the required masks in a multi-process way
+    from multiprocessing import Pool
+    from functools import partial
+    N = 8
+    # chunk the image_list into N chunks
+    chunk_size = len(image_list) // N
+    chunks = [image_list[i:i + chunk_size] for i in range(0, len(image_list), chunk_size)]
+    with Pool(N) as pool:
+        # Use partial to pass the zf_list and image_list to the function
+        func = partial(get_all_required_masks, zf_list)
+        results = pool.map(func, chunks)
+        # combine the results
+        required_masks = {}
+        for result in results:
+            for k, v in result.items():
+                if k in required_masks:
+                    required_masks[k].extend(v)
+                else:
+                    required_masks[k] = v
 
 
 if __name__ == "__main__":
