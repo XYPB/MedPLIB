@@ -38,5 +38,6 @@ if __name__ == "__main__":
                 print(f"KeyError: {image_path} not found in the zip file.")
             except Exception as e:
                 print(f"Error extracting {image_path}: {e}")
+            break
     print(f"All required images have been extracted to {OUT_DIR}.")
 
