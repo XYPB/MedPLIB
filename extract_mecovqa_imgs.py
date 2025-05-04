@@ -67,7 +67,7 @@ if __name__ == "__main__":
     # total_images = total_images[:64]
     
     # Determine number of CPU cores to use
-    num_cores = 4
+    num_cores = 1
     print(f"Using {num_cores} CPU cores for parallel extraction")
     
     # Split work across cores
@@ -78,9 +78,10 @@ if __name__ == "__main__":
     # Create process arguments with IDs
     process_args = [(image_chunks[i], i) for i in range(num_cores)]
     
+    extract_images_chunk(process_args[0])  # Test the first chunk extraction
     # Use Pool to manage processes
-    with mp.Pool(processes=num_cores) as pool:
-        pool.map(extract_images_chunk, process_args)
+    # with mp.Pool(processes=num_cores) as pool:
+        # pool.map(extract_images_chunk, process_args)
         
     print(f"All required images have been extracted to {OUT_DIR}")
 
