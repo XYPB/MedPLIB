@@ -13,3 +13,4 @@ serve_images/*
 
 data/
 tmp/
+scripts/slurm-*
