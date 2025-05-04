@@ -590,7 +590,6 @@ class LazySupervisedDataset(Dataset):
         data_dict["image_path"] = image_path
 
 
-
         data_dict['inference'] = False
         data_dict['tokenizer'] = self.tokenizer
 

@@ -97,7 +97,7 @@ def DataCollatorForSupervisedDataset(list_data_dict: Sequence[Dict], inference: 
             "images_clip": torch.stack(images_clip_list, dim=0),
             "input_ids": batch['input_ids'],
             "labels": batch['labels'],
-            "attention_mask": batch['attention_mask'],
+            "attention_masks": batch['attention_mask'],
             "masks_list": batch['masks'],
             "label_list": batch['label_list'],
             "resize_list": resize_list,

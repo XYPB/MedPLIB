@@ -408,7 +408,7 @@ def validate_vqa(val_loader, model_engine, epoch, args, tokenizer, fea_hooks=Non
 
         indices = (input_dict['input_ids'] == 29901).nonzero(as_tuple=True)
         input_ids = input_dict['input_ids'][:, :indices[1][-1]+1]
-        attention_mask = input_dict['attention_mask'][:, :indices[1][-1]+1]
+        attention_mask = input_dict['attention_masks'][:, :indices[1][-1]+1]
         with torch.no_grad():
             output_ids = model_engine.generate(
                 input_ids,
@@ -503,7 +503,7 @@ def validate_seg(val_loader, model_engine, epoch, args, tokenizer, fea_hooks=Non
 
         indices = (input_dict['input_ids'] == 29901).nonzero(as_tuple=True)
         input_ids = input_dict['input_ids'][:, :indices[1][-1]+1]
-        attention_mask = input_dict['attention_mask'][:, :indices[1][-1]+1]
+        attention_mask = input_dict['attention_masks'][:, :indices[1][-1]+1]
         with torch.no_grad():
             # output_dict = model_engine(**input_dict)
             output_ids, pred_masks = model_engine.evaluate(
