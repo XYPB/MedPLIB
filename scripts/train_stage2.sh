@@ -1,5 +1,6 @@
 
-module load NCCL/2.16.2-GCCcore-12.2.0-CUDA-11.8.0
+# module load NCCL/2.16.2-GCCcore-12.2.0-CUDA-11.8.0
+# export NVCC_APPEND_FLAGS='-allow-unsupported-compiler'
 NCCL_DEBUG=WARN
 time=$(date +%Y-%m-%d-%H-%M-%S)
 exp_name="medplib-7b-stage2"
