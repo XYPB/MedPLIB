@@ -85,7 +85,7 @@ if __name__ == "__main__":
     image2mask = json.load(open(JSON_PATH, 'r'))
     
     # Determine number of processes and chunk size
-    num_processes = 8
+    num_processes = 2
     chunk_size = max(1, len(image_list) // num_processes)
     
     # Split images into chunks
