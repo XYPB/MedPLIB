@@ -64,10 +64,10 @@ if __name__ == "__main__":
     print(f"Total number of required masks: {len(required_masks)}")
     total_images = sorted(required_images + required_masks)
     print(f"Total number of images to extract: {len(total_images)}")
-    total_images = total_images[:64]
+    # total_images = total_images[:64]
     
     # Determine number of CPU cores to use
-    num_cores = 2
+    num_cores = 4
     print(f"Using {num_cores} CPU cores for parallel extraction")
     
     # Split work across cores
