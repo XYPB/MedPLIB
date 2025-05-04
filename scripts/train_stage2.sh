@@ -6,8 +6,8 @@ exp_dir="runs/$exp_name"
 mkdir -p "$exp_dir"
 # deepspeed --include=localhost:0, --master_port=65001 
 python train_ds_medplib.py \
-  --version="/home/yd344/palmer_scratch/huggingface_models/llava-v1.5-7b" \
-  --vision_tower='/home/yd344/palmer_scratch/huggingface_models/clip-vit-large-patch14-336' \
+  --version="microsoft/llava-med-v1.5-mistral-7b" \
+  --vision_tower='openai/clip-vit-large-patch14-336' \
   --data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Complex.json' \
   --val_data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/test/MeCoVQA_Complex_VQA_test.json' \
   --image_folder='/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1' \
