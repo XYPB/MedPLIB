@@ -24,10 +24,10 @@ def merge_masks(mask_list):
     """
     
     # Split masks according to their class
-    base_mask_name = ''.join(mask_list[0].split('---')[:-1])
+    base_mask_name = ''.join(mask_list[0].split('--')[:-1])
     mask_cls2idx_dict = {}
     for p in mask_list:
-        cls2idx = p.replace('.png', '').split('---')[-1].split('_')
+        cls2idx = p.replace('.png', '').split('--')[-1].split('_')
         cls, idx = cls2idx[0], cls2idx[1]
         if cls not in mask_cls2idx_dict:
             mask_cls2idx_dict[cls] = []
@@ -75,7 +75,6 @@ def process_image_chunk(chunk_data):
     """
     image_chunk, image2mask = chunk_data
     for image_path in tqdm(image_chunk, total=len(image_chunk), desc="Processing images"):
-        print(image_path)
         mask_list = image2mask.get(image_path, [])
         if len(mask_list) == 0:
             continue
