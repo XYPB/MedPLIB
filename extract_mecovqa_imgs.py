@@ -66,6 +66,14 @@ if __name__ == "__main__":
     print(f"Total number of images to extract: {len(total_images)}")
     # total_images = total_images[:64]
     
+    total_images_todo = []
+    for img in total_images:
+        full_path = os.path.join(OUT_DIR, img)
+        if not os.path.exists(full_path):
+            total_images_todo.append(img)
+    print(f"Total number of images to extract: {len(total_images_todo)}")
+    total_images = total_images_todo
+    
     # Determine number of CPU cores to use
     num_cores = 1
     print(f"Using {num_cores} CPU cores for parallel extraction")
