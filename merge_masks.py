@@ -75,7 +75,7 @@ def process_image_chunk(chunk_data):
     image_chunk, image2mask = chunk_data
     for image_path in tqdm(image_chunk, total=len(image_chunk), desc="Processing images"):
         print(image_path)
-        mask_list = image2mask.get(image_path.replace('/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/', ''), [])
+        mask_list = image2mask.get(image_path, [])
         if len(mask_list) == 0:
             continue
         merge_masks(mask_list)
@@ -89,6 +89,7 @@ def split_list(lst, n):
 if __name__ == "__main__":
     # Load data
     image_list = glob(os.path.join(LOCAL_IMAGE_DIR, '*.png'))
+    image_list = [img.replace('/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/', '') for img in image_list]
     image2mask = json.load(open(JSON_PATH, 'r'))
     
     # Determine number of processes and chunk size
