@@ -5,13 +5,12 @@ exp_name="medplib-7b-stage2"
 exp_dir="runs/$exp_name"
 mkdir -p "$exp_dir"
 deepspeed --include=localhost:0,1,2,3 --master_port=65001 train_ds_medplib.py \
-  --version="/root/huggingface_models/llava-v1.5-7b" \
-  --vision_tower='/root/huggingface_models/clip-vit-large-patch14-336' \
-  --pretrain_mm_mlp_adapter='/root/paddlejob/workspace/env_run/output/LLava_latest/LLaVA/checkpoints/llava-med-v1.5-7b-pretrain_bs128/mm_projector.bin' \
-  --data_path='/root/paddlejob/workspace/env_run/data/huangxiaoshuang/jsons/MeCoVQA/MeCoVQA_Complex+Region_VQA_train+Public_VQA.json' \
-  --val_data_path='/root/paddlejob/workspace/env_run/data/huangxiaoshuang/jsons/MeCoVQA/MeCoVQA_Complex_VQA_test_rand200.json' \
-  --image_folder='/tmp/v2_mnt/HCG/huangxiaoshuang/SAMed2D_v1' \
-  --vision_pretrained="/root/huggingface_models/sam-med2d_b.pth" \
+  --version="/home/yd344/palmer_scratch/huggingface_models/llava-v1.5-7b" \
+  --vision_tower='/home/yd344/palmer_scratch/huggingface_models/clip-vit-large-patch14-336' \
+  --data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Complex.json' \
+  --val_data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/test/MeCoVQA_Complex_VQA_test.json' \
+  --image_folder='/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1' \
+  --vision_pretrained="/home/yd344/palmer_scratch/huggingface_models/sam-med2d_b.pth" \
   --exp_name=$exp_name \
   --epochs=3 \
   --batch_size=16 \
