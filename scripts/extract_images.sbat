@@ -1,0 +1,17 @@
+#!/bin/bash
+
+#SBATCH --job-name=extract_samed_images
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --partition=week
+#SBATCH --time=3-00:00:00
+#SBATCH --mem-per-cpu=4g
+#SBATCH --mail-type=END,FAIL
+#SBATCH --mail-user=yuexi.du@yale.edu
+
+cd ~/project/MedPLIB
+module load miniconda
+conda activate medplib
+git pull
+
+python extract_mecovqa_imgs.py

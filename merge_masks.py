@@ -22,6 +22,8 @@ def merge_masks(mask_list):
     Returns:
         np.ndarray: Merged mask image.
     """
+    
+    # Split masks according to their class
     base_mask_name = ''.join(p.split('---')[:-1])
     mask_cls2idx_dict = {}
     for p in mask_list:
@@ -33,6 +35,7 @@ def merge_masks(mask_list):
     # remove keys with only one value
     mask_cls2idx_dict = {k: v for k, v in mask_cls2idx_dict.items() if len(v) > 1}
 
+    # Merge masks from the same class
     for cls in mask_cls2idx_dict.keys():
         merged_mask = None
         for idx in mask_cls2idx_dict[cls]:
@@ -82,7 +85,7 @@ if __name__ == "__main__":
     image2mask = json.load(open(JSON_PATH, 'r'))
     
     # Determine number of processes and chunk size
-    num_processes = mp.cpu_count()
+    num_processes = 8
     chunk_size = max(1, len(image_list) // num_processes)
     
     # Split images into chunks
