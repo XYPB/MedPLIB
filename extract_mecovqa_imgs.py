@@ -45,8 +45,9 @@ def split_list(lst, n):
 def extract_images_chunk(args):
     """Worker function to extract a chunk of images using its own zipfile handle"""
     chunk_images, process_id = args
+    print(f"Process {process_id} started with {len(chunk_images)} images.")
     with zipfile.ZipFile(ZIP_PATH) as zf:
-        print(len(chunk_images), len(zf.namelist()))
+        print('Total images number: ', len(zf.namelist()))
         for image_path in tqdm(chunk_images, total=len(chunk_images), desc=f"Process {process_id}", position=process_id):
             try:
                 zf.extract(image_path, OUT_DIR)
