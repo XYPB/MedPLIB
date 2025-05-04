@@ -47,7 +47,7 @@ def extract_images_chunk(args):
     chunk_images, process_id = args
     print(f"Process {process_id} started with {len(chunk_images)} images.")
     with zipfile.ZipFile(ZIP_PATH) as zf:
-        for image_path in tqdm(chunk_images, total=len(chunk_images), desc=f"Process {process_id}", position=process_id):
+        for image_path in tqdm(chunk_images, total=len(chunk_images)):
             try:
                 zf.extract(image_path, OUT_DIR)
             except KeyError:
@@ -67,7 +67,7 @@ if __name__ == "__main__":
     total_images = total_images[:64]
     
     # Determine number of CPU cores to use
-    num_cores = 8
+    num_cores = 2
     print(f"Using {num_cores} CPU cores for parallel extraction")
     
     # Split work across cores
