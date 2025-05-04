@@ -78,6 +78,10 @@ def process_image_chunk(chunk_data):
         merge_masks(mask_list)
     return len(image_chunk)
 
+def split_list(lst, n):
+    """Split list into n roughly equal chunks"""
+    k, m = divmod(len(lst), n)
+    return [lst[i * k + min(i, m):(i + 1) * k + min(i + 1, m)] for i in range(n)]
 
 if __name__ == "__main__":
     # Load data
@@ -86,10 +90,9 @@ if __name__ == "__main__":
     
     # Determine number of processes and chunk size
     num_processes = 2
-    chunk_size = max(1, len(image_list) // num_processes)
     
     # Split images into chunks
-    image_chunks = [image_list[i:i + chunk_size] for i in range(0, len(image_list), chunk_size)]
+    image_chunks = split_list(image_list, num_processes)
     chunk_args = [(chunk, image2mask) for chunk in image_chunks]
     
     print(f"Processing {len(image_list)} images using {num_processes} processes in {len(image_chunks)} chunks")
