@@ -24,7 +24,7 @@ def merge_masks(mask_list):
     """
     
     # Split masks according to their class
-    base_mask_name = '--'.join(mask_list[0].split('--')[:-1])
+    base_mask_name = '--'.join(mask_list[0].split('--')[:-1]).repalce('masks/', '')
     mask_cls2idx_dict = {}
     for p in mask_list:
         cls2idx = p.replace('.png', '').split('--')[-1].split('_')
@@ -40,7 +40,7 @@ def merge_masks(mask_list):
     for cls in mask_cls2idx_dict.keys():
         merged_mask = None
         for idx in mask_cls2idx_dict[cls]:
-            mask_path = os.path.join('masks', f"{base_mask_name}--{cls}_{idx}.png")
+            mask_path = os.path.join("/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1", 'masks', f"{base_mask_name}--{cls}_{idx}.png")
             if not os.path.exists(mask_path):
                 print(f"Mask file {mask_path} does not exist.")
                 continue
