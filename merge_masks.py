@@ -24,7 +24,7 @@ def merge_masks(mask_list):
     """
     
     # Split masks according to their class
-    base_mask_name = ''.join(p.split('---')[:-1])
+    base_mask_name = ''.join(mask_list[0].split('---')[:-1])
     mask_cls2idx_dict = {}
     for p in mask_list:
         cls, idx = p.replace('.png', '').split('---')[-1].split('_')
