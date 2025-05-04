@@ -74,7 +74,10 @@ def process_image_chunk(chunk_data):
     """
     image_chunk, image2mask = chunk_data
     for image_path in tqdm(image_chunk, total=len(image_chunk), desc="Processing images"):
-        mask_list = image2mask.get(image_path.replace('images/', ''), [])
+        print(image_path)
+        mask_list = image2mask.get(image_path.replace('/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/', ''), [])
+        if len(mask_list) == 0:
+            continue
         merge_masks(mask_list)
     return len(image_chunk)
 
