@@ -66,7 +66,7 @@ if __name__ == "__main__":
     total_images = total_images[:64]
     
     # Determine number of CPU cores to use
-    num_cores = mp.cpu_count()
+    num_cores = 8
     print(f"Using {num_cores} CPU cores for parallel extraction")
     
     # Split work across cores
