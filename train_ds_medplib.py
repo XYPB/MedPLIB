@@ -579,6 +579,8 @@ def train(
                 input_dict["images"] = input_dict["images"].float()
                 input_dict["images_clip"] = input_dict["images_clip"].float()
 
+            print(input_dict)
+
             output_dict = model(**input_dict)
 
             loss = output_dict["loss"]
