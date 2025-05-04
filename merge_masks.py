@@ -24,7 +24,7 @@ def merge_masks(mask_list):
     """
     
     # Split masks according to their class
-    base_mask_name = ''.join(mask_list[0].split('--')[:-1])
+    base_mask_name = '--'.join(mask_list[0].split('--')[:-1])
     mask_cls2idx_dict = {}
     for p in mask_list:
         cls2idx = p.replace('.png', '').split('--')[-1].split('_')
@@ -40,7 +40,7 @@ def merge_masks(mask_list):
     for cls in mask_cls2idx_dict.keys():
         merged_mask = None
         for idx in mask_cls2idx_dict[cls]:
-            mask_path = os.path.join('masks', f"{base_mask_name}---{cls}_{idx}.png")
+            mask_path = os.path.join('masks', f"{base_mask_name}--{cls}_{idx}.png")
             if not os.path.exists(mask_path):
                 print(f"Mask file {mask_path} does not exist.")
                 continue
@@ -57,9 +57,9 @@ def merge_masks(mask_list):
             
             merged_mask = np.bitwise_or(merged_mask, mask_array)
         if merged_mask is None:
-            print(f"No valid masks found for {base_mask_name}---{cls}.")
+            print(f"No valid masks found for {base_mask_name}--{cls}.")
             continue
-        output_path = os.path.join(OUTPUT_DIR, f"{base_mask_name}---{cls}_merged.png")
+        output_path = os.path.join(OUTPUT_DIR, f"{base_mask_name}--{cls}_merged.png")
         if merged_mask.max() <= 1.0:
             merged_mask = merged_mask * 255
         merged_mask = merged_mask.astype(np.uint8)
