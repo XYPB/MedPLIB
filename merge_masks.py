@@ -48,7 +48,7 @@ def merge_masks(mask_list):
             # Open the mask image
             mask_image = Image.open(mask_path).convert("L")
             mask_array = np.array(mask_image)
-            if mask_image.max() > 1:
+            if mask_array.max() > 1:
                 mask_array = mask_array // 255
             mask_array = mask_array.astype(np.uint8)
 
