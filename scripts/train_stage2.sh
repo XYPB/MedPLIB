@@ -1,10 +1,4 @@
 
-# module load NCCL/2.16.2-GCCcore-12.2.0-CUDA-11.8.0
-# export NVCC_APPEND_FLAGS='-allow-unsupported-compiler'
-# export CC=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc
-# export CXX=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
-# export CUDAHOSTCXX=$CXX
-
 NCCL_DEBUG=WARN
 time=$(date +%Y-%m-%d-%H-%M-%S)
 exp_name="medplib-7b-stage2"

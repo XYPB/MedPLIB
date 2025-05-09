@@ -19,6 +19,7 @@ module load miniconda
 conda activate medplib
 git pull
 
+module load NCCL/2.16.2-GCCcore-12.2.0-CUDA-11.8.0
 export CC=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc
 export CXX=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
 export CUDAHOSTCXX=$CXX
