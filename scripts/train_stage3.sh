@@ -5,7 +5,7 @@ exp_name="medplib-7b-stage3"
 exp_dir="runs/$exp_name"
 mkdir -p "$exp_dir"
 
-deepspeed --include=localhost:0, --master_port=65000 train_ds_medplib.py \
+deepspeed --include=localhost:0 --master_port=65000 train_ds_medplib.py \
   --version="/home/yd344/project/MedPLIB/runs/medplib-7b-stage2/hf" \
   --vision_tower='openai/clip-vit-large-patch14-336' \
   --data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Grounding.json' \
