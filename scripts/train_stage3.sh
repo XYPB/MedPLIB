@@ -6,7 +6,7 @@ exp_dir="runs/$exp_name"
 mkdir -p "$exp_dir"
 
 deepspeed --include=localhost:0 --master_port=65000 train_ds_medplib.py \
-  --version="/home/yd344/project/MedPLIB/runs/medplib-7b-stage2/ckpt_model/global_step9083" \
+  --version="/home/yd344/project/MedPLIB/runs/medplib-7b-stage2/ckpt_model" \
   --vision_tower='openai/clip-vit-large-patch14-336' \
   --data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Grounding.json' \
   --val_data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/test/MeCoVQA_Grounding_test.json' \
