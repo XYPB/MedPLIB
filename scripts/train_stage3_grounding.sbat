@@ -1,0 +1,27 @@
+#!/bin/bash
+
+#SBATCH --job-name=MedPLIB_train
+#SBATCH --comment=Train_stage2_on_grounding_data
+#SBATCH --time=2-00:00:00
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-type=END
+#SBATCH --mail-user=yuexi.du@yale.edu
+
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=32
+#SBATCH --mem-per-cpu=6g
+#SBATCH --partition gpu
+#SBATCH --nodes 1
+#SBATCH --gpus a100:4
+
+cd ~/project/MedPLIB
+module load miniconda
+conda activate medplib
+git pull
+
+module load NCCL/2.16.2-GCCcore-12.2.0-CUDA-11.8.0
+export CC=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-gcc
+export CXX=$CONDA_PREFIX/bin/x86_64-conda-linux-gnu-g++
+export CUDAHOSTCXX=$CXX
+
+./scripts/train_stage3.sh
