@@ -71,42 +71,42 @@ if __name__ == "__main__":
     # image_list = [img + '.png' for img in image_list if 'png' not in img]
     # print(image_list[:10])
     
-    extract_images_chunk((image_list, 0))  # Test the first chunk extraction
+    # extract_images_chunk((image_list, 0))  # Test the first chunk extraction
 
-    # required_images = get_all_required_images()
-    # required_masks = get_all_required_masks(required_images)
-    # print(f"Total number of required images: {len(required_images)}")
-    # print(f"Total number of required masks: {len(required_masks)}")
-    # total_images = sorted(required_images + required_masks)
-    # print(f"Total number of images to extract: {len(total_images)}")
-    # # total_images = total_images[:64]
+    required_images = get_all_required_images()
+    required_masks = get_all_required_masks(required_images)
+    print(f"Total number of required images: {len(required_images)}")
+    print(f"Total number of required masks: {len(required_masks)}")
+    total_images = sorted(required_images + required_masks)
+    print(f"Total number of images to extract: {len(total_images)}")
+    # total_images = total_images[:64]
     
-    # total_images_todo = []
-    # for img in total_images:
-    #     full_path = os.path.join(OUT_DIR, img)
-    #     if not os.path.exists(full_path):
-    #         total_images_todo.append(img)
-    # print(f"Actual total number of images remains to be extracted: {len(total_images_todo)}")
-    # total_images = total_images_todo
+    total_images_todo = []
+    for img in total_images:
+        full_path = os.path.join(OUT_DIR, img)
+        if not os.path.exists(full_path):
+            total_images_todo.append(img)
+    print(f"Actual total number of images remains to be extracted: {len(total_images_todo)}")
+    total_images = total_images_todo
     
-    # exit()
+    exit()
     
-    # # Determine number of CPU cores to use
-    # num_cores = 1
-    # print(f"Using {num_cores} CPU cores for parallel extraction")
+    # Determine number of CPU cores to use
+    num_cores = 1
+    print(f"Using {num_cores} CPU cores for parallel extraction")
     
-    # # Split work across cores
-    # image_chunks = split_list(total_images, num_cores)
-    # chunk_sum = sum([len(c) for c in image_chunks])
-    # assert chunk_sum == len(total_images), f"Chunk sum {chunk_sum} does not match total images {len(total_images)}"
+    # Split work across cores
+    image_chunks = split_list(total_images, num_cores)
+    chunk_sum = sum([len(c) for c in image_chunks])
+    assert chunk_sum == len(total_images), f"Chunk sum {chunk_sum} does not match total images {len(total_images)}"
     
-    # # Create process arguments with IDs
-    # process_args = [(image_chunks[i], i) for i in range(num_cores)]
+    # Create process arguments with IDs
+    process_args = [(image_chunks[i], i) for i in range(num_cores)]
     
-    # extract_images_chunk(process_args[0])  # Test the first chunk extraction
-    # # Use Pool to manage processes
-    # # with mp.Pool(processes=num_cores) as pool:
-    #     # pool.map(extract_images_chunk, process_args)
+    extract_images_chunk(process_args[0])  # Test the first chunk extraction
+    # Use Pool to manage processes
+    # with mp.Pool(processes=num_cores) as pool:
+        # pool.map(extract_images_chunk, process_args)
         
-    # print(f"All required images have been extracted to {OUT_DIR}")
+    print(f"All required images have been extracted to {OUT_DIR}")
 
