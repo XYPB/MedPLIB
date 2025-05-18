@@ -17,7 +17,9 @@ for item in tqdm(data):
 print(f"Total number of images: {len(data)}")
 print(f"Total number of images after filtering: {len(filtered_data)}")
 print(f"Total number of missing images: {len(missing_images)}")
+print(f"Missing images: {missing_images[:100]}")
 # Save the filtered data to a new JSON file
-output_json = "/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Complex_local+Region_filtered.json"
-with open(output_json, 'w') as f:
-    json.dump(filtered_data, f, indent=2)
+if len(missing_images) > 0:
+    output_json = target_json.replace('.json', '_filtered.json')
+    with open(output_json, 'w') as f:
+        json.dump(filtered_data, f, indent=2)
