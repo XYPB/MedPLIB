@@ -12,7 +12,7 @@ for json_file in target_json:
         print(f"Loading {json_file}")
         data = json.load(f)
         fixed_data = []
-        missing_cnt = 0
+        fixed_cnt = 0
         for item in data:
             image_path = item['image']
             if image_path.startswith('images/'):
@@ -21,14 +21,14 @@ for json_file in target_json:
                     fixed_item = item
                     fixed_item['image'] = fixed_path
                     fixed_data.append(fixed_item)
+                    fixed_cnt += 1
                     if not os.path.exists(os.path.join(IMG_FOLDER, fixed_path)):
-                        missing_cnt += 1
                         missing_images.add(image_path + '.png')
                     continue
             fixed_data.append(item)
         assert len(fixed_data) == len(data), "Data length mismatch after fixing image paths."
-        if missing_cnt > 0:
-            print(f"Total number of missing images in {json_file}: {missing_cnt}")
+        if fixed_cnt > 0:
+            print(f"Total number of missing images in {json_file}: {fixed_cnt}")
             output_json = json_file.replace('.json', '_fixed.json')
             with open(output_json, 'w') as f:
                 json.dump(fixed_data, f, indent=2)
