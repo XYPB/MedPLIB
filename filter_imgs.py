@@ -1,12 +1,13 @@
 import os
 import json
+from tqdm import tqdm
 
 target_json = "/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Complex_local+Region.json"
 data = json.load(open(target_json, 'r'))
 
 filtered_data = []
 missing_images = []
-for item in data:
+for item in tqdm(data):
     image_path = item['image']
     if not os.path.exists(image_path):
         missing_images.append(image_path)
