@@ -23,6 +23,7 @@ def get_all_required_images():
                 image_path = item['image']
                 if image_path.startswith('images/'):
                     all_images.add('SAMed2Dv1/' + image_path)
+    print(f"Total number of images in JSON files: {len(all_images)}")
     return sorted(list(all_images))
 
 
