@@ -34,5 +34,4 @@ deepspeed --include=localhost:0,1 --master_port=65000 train_ds_medplib.py \
   --save_steps 300 \
   --sam_img_size 256 \
   --train_mask_decoder \
-  --eval_only \
   2>&1|tee -a runs/$exp_name/$time.log
