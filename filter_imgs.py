@@ -7,13 +7,17 @@ data = json.load(open(target_json, 'r'))
 
 filtered_data = []
 missing_images = []
+cnt = 0
 for item in tqdm(data):
     image_path = item['image']
     if not os.path.exists(image_path):
         missing_images.append(image_path)
         continue
+    if image_path.startswith('images/'):
+        cnt += 1
     filtered_data.append(item)
-    
+
+print(cnt)
 print(f"Total number of images: {len(data)}")
 print(f"Total number of images after filtering: {len(filtered_data)}")
 print(f"Total number of missing images: {len(missing_images)}")
