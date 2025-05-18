@@ -30,3 +30,5 @@ if len(missing_images) > 0:
     output_json = target_json.replace('.json', '_filtered.json')
     with open(output_json, 'w') as f:
         json.dump(filtered_data, f, indent=2)
+    with open(output_json.replace('.json', '_missing_images.json'), 'w') as f:
+        json.dump(list(missing_images), f)
