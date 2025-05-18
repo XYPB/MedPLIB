@@ -15,6 +15,7 @@ IMG_EXTS   = {".jpg", ".jpeg", ".png", ".gif",
 
 def get_all_required_images():
     target_json = glob("./data/MeCoVQA/*/*.json")
+    print(target_json)
     all_images = set(['SAMed2Dv1/SAMed2D_v1_class_mapping_id.json', 'SAMed2Dv1/SAMed2D_v1.json'])
     for json_file in target_json:
         with open(json_file, 'r') as f:
@@ -74,6 +75,8 @@ if __name__ == "__main__":
             total_images_todo.append(img)
     print(f"Total number of images to extract: {len(total_images_todo)}")
     total_images = total_images_todo
+    
+    exit()
     
     # Determine number of CPU cores to use
     num_cores = 1
