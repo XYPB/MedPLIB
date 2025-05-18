@@ -5,18 +5,17 @@ from tqdm import tqdm
 target_json = "/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Complex_local+Region.json"
 data = json.load(open(target_json, 'r'))
 
-filtered_data = []
-missing_images = []
+filtered_data = set()
+missing_images = set()
 cnt = 0
-undo_set = set()
 for item in tqdm(data):
     image_path = item['image']
     if not os.path.exists(image_path):
-        missing_images.append(image_path)
+        missing_images.add(image_path)
         continue
     if image_path.startswith('images/'):
         cnt += 1
-    filtered_data.append(item)
+    filtered_data.add(item)
 
 print(cnt)
 print(f"Total number of images: {len(data)}")
