@@ -20,7 +20,7 @@ def parse_args(args):
         description="merge lora weights and save model with hf format"
     )
     parser.add_argument(
-        "--version", default="liuhaotian/llava-llama-2-13b-chat-lightning-preview"
+        "--version", default="microsoft/llava-med-v1.5-mistral-7b"
     )
     parser.add_argument("--vis_save_path", default="./vis_output", type=str)
     parser.add_argument(
@@ -32,12 +32,12 @@ def parse_args(args):
     )
     parser.add_argument("--vision_pretrained", default="PATH_TO_SAM_ViT-H", type=str)
     parser.add_argument("--out_dim", default=256, type=int)
-    parser.add_argument("--sam_img_size", default=1024, type=int, help="image size")
+    parser.add_argument("--sam_img_size", default=256, type=int, help="image size")
     parser.add_argument("--model_max_length", default=512, type=int)
     parser.add_argument(
-        "--vision_tower", default="openai/clip-vit-large-patch14", type=str
+        "--vision_tower", default="openai/clip-vit-large-patch14-336", type=str
     )
-    parser.add_argument("--lora_r", default=8, type=int)
+    parser.add_argument("--lora_r", default=16, type=int)
     parser.add_argument("--lora_alpha", default=16, type=int)
     parser.add_argument("--lora_dropout", default=0.05, type=float)
     parser.add_argument("--lora_target_modules", default="q_proj,v_proj", type=str)
