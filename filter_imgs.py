@@ -8,6 +8,7 @@ data = json.load(open(target_json, 'r'))
 filtered_data = []
 missing_images = []
 cnt = 0
+undo_set = set()
 for item in tqdm(data):
     image_path = item['image']
     if not os.path.exists(image_path):
