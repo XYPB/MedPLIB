@@ -21,10 +21,10 @@ for item in tqdm(data):
     filtered_data.append(item)
 
 print(cnt)
-print(f"Total number of images: {len(data)}")
-print(f"Total number of images after filtering: {len(filtered_data)}")
+print(f"Total number of data: {len(data)}")
+print(f"Total number of data after filtering: {len(filtered_data)}")
 print(f"Total number of missing images: {len(missing_images)}")
-print(f"Missing images: {missing_images[:100]}")
+print(f"Missing images: {list(missing_images)[:100]}")
 # Save the filtered data to a new JSON file
 if len(missing_images) > 0:
     output_json = target_json.replace('.json', '_filtered.json')
