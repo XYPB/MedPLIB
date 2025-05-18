@@ -17,13 +17,17 @@ def get_all_required_images():
     target_json = glob("./data/MeCoVQA/*/*.json")
     print(target_json)
     all_images = set(['SAMed2Dv1/SAMed2D_v1_class_mapping_id.json', 'SAMed2Dv1/SAMed2D_v1.json'])
+    cnt = 0
     for json_file in target_json:
         with open(json_file, 'r') as f:
+            print(f"Loading {json_file}")
             data = json.load(f)
             for item in data:
                 image_path = item['image']
                 if image_path.startswith('images/'):
                     all_images.add('SAMed2Dv1/' + image_path)
+            print(f"Total number of images in {json_file}: {len(all_images)-cnt}")
+            cnt = len(all_images)
     print(f"Total number of images in JSON files: {len(all_images)}")
     return sorted(list(all_images))
 
@@ -73,7 +77,7 @@ if __name__ == "__main__":
         full_path = os.path.join(OUT_DIR, img)
         if not os.path.exists(full_path):
             total_images_todo.append(img)
-    print(f"Total number of images to extract: {len(total_images_todo)}")
+    print(f"Actual total number of images remains to be extracted: {len(total_images_todo)}")
     total_images = total_images_todo
     
     exit()
