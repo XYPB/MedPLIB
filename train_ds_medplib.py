@@ -416,9 +416,6 @@ def main(args):
         # 如果不使用 MOE，直接使用所有参数
         optimizer_grouped_parameters = model.parameters()
 
-    
-    
-
     model_engine, optimizer, train_loader, scheduler = deepspeed.initialize(
         model=model,
         model_parameters=optimizer_grouped_parameters,
