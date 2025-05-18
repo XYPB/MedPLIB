@@ -5,12 +5,15 @@ from tqdm import tqdm
 target_json = "/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Complex_local+Region.json"
 data = json.load(open(target_json, 'r'))
 
+IMG_FOLDER = "/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/"
+
 filtered_data = []
 missing_images = set()
 cnt = 0
 for item in tqdm(data):
     image_path = item['image']
-    if not os.path.exists(image_path):
+    local_path = os.path.join(IMG_FOLDER, image_path)
+    if not os.path.exists(local_path):
         missing_images.add(image_path)
         continue
     if image_path.startswith('images/'):
