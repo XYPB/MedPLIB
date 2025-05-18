@@ -65,7 +65,7 @@ if __name__ == "__main__":
     OUT_DIR.mkdir(parents=True, exist_ok=True)
     
     # find missing images
-    image_list = json.load(open("MeCoVQA-Complex_local+Region_filtered_missing_images.json", 'r'))
+    image_list = json.load(open("data/MeCoVQA/train/MeCoVQA-Complex_local+Region_filtered_missing_images.json", 'r'))
     image_list = ["SAMed2Dv1/" + img for img in image_list]
     image_list = sorted(image_list)
     
