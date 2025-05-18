@@ -1,13 +1,13 @@
 
 NCCL_DEBUG=WARN
 time=$(date +%Y-%m-%d-%H-%M-%S)
-exp_name="medplib-7b-stage2_grounding"
+exp_name="medplib-7b-stage2_all"
 exp_dir="runs/$exp_name"
 mkdir -p "$exp_dir"
-deepspeed --include=localhost:0,1, --master_port=65001 train_ds_medplib.py \
+deepspeed --include=localhost:0 --master_port=65001 train_ds_medplib.py \
   --version="microsoft/llava-med-v1.5-mistral-7b" \
   --vision_tower='openai/clip-vit-large-patch14-336' \
-  --data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Grounding.json' \
+  --data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Complex_local+MeCoVQA-Region.json' \
   --val_data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/test/MeCoVQA_Complex_VQA_test.json' \
   --image_folder='/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1' \
   --vision_pretrained="/home/yd344/palmer_scratch/huggingface_models/sam-med2d_b.pth" \
