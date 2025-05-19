@@ -443,6 +443,7 @@ class LazySupervisedDataset(Dataset):
             cur_len = cur_len if 'image' in sample else -cur_len
             length_list.append(cur_len)
         return length_list
+
     def pad_tensor_channelwise(self, x, pad_h, pad_w, pad_values, is_mask=False):
         """
         Pad a 3-channel image tensor with different padding values for each channel,
