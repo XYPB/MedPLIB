@@ -7,6 +7,7 @@ from functools import partial
 import types
 import math
 import random
+import datetime
 
 import deepspeed
 import numpy as np
@@ -15,6 +16,7 @@ import tqdm
 import transformers
 from peft import LoraConfig, get_peft_model
 from torch.utils.tensorboard import SummaryWriter
+import wandb
 
 from model.LISA import LISAForCausalLM
 from model.MedPLIB import MedPLIBForCausalLM
@@ -107,6 +109,11 @@ def parse_args(args):
         type=str,
         choices=["llava_v1", "llava_llama_2"],
     )
+    
+    # ---------------- Logging setting -----------------
+    parser.add_argument("--use_wandb", action="store_true", default=False, help="Whether to use wandb for logging")
+    parser.add_argument("--wandb_project", type=str, default="MedPLIB", help="Wandb project name")
+    parser.add_argument("--wandb_tags", type=str, default=None, help="Comma-separated list of tags for wandb run")
 
     # ---------------region sampler setting-----------
     parser.add_argument("--region_fea_adapter", action="store_true", default=False)
@@ -165,6 +172,24 @@ def test_randomness():
     print("PyTorch Linear weights:")
     print(linear.weight)
 
+class Logger:
+    """A simple wrapper class that provides unified interface for tensorboard and wandb logging."""
+    def __init__(self, args, tensorboard_writer=None, use_wandb=False):
+        self.tensorboard_writer = tensorboard_writer
+        self.use_wandb = use_wandb
+        self.args = args
+    
+    def add_scalar(self, tag, value, step):
+        """Log a scalar value."""
+        if self.tensorboard_writer is not None:
+            self.tensorboard_writer.add_scalar(tag, value, step)
+        if self.use_wandb:
+            wandb.log({tag: value}, step=step)
+
+    def flush(self):
+        """Flush the loggers."""
+        if self.tensorboard_writer is not None:
+            self.tensorboard_writer.flush()
 
 def main(args):
     global local_rank
@@ -182,6 +207,24 @@ def main(args):
         writer = SummaryWriter(args.log_dir)
     else:
         writer = None
+
+    # Initialize wandb if requested
+    if args.local_rank == 0 and args.use_wandb:
+        # Add date and time to run name for better tracking
+        current_time = datetime.datetime.now().strftime("%Y-%m-%d_%H-%M-%S")
+        run_name = f"{current_time}_{args.exp_name}"
+        
+        wandb_tags = args.wandb_tags.split(",") if args.wandb_tags else None
+        
+        wandb.init(
+            project=args.wandb_project,
+            name=run_name,
+            config=vars(args),
+            tags=wandb_tags,
+        )
+        print(f"Initialized wandb run: {run_name}")
+    
+    logger = Logger(args, tensorboard_writer=writer, use_wandb=args.use_wandb and args.local_rank == 0)
 
     # Create model
     tokenizer = transformers.AutoTokenizer.from_pretrained(
@@ -472,7 +515,7 @@ def main(args):
     best_score, cur_ciou = 0.0, 0.0
 
     if args.eval_only:
-        giou, ciou = validate(val_loader, model_engine, 0, writer, args)
+        giou, ciou = validate(val_loader, model_engine, 0, logger, args)
         exit()
 
     for epoch in range(args.start_epoch, args.epochs):
@@ -482,14 +525,14 @@ def main(args):
             model_engine,
             epoch,
             scheduler,
-            writer,
+            logger,
             train_iter,
             args,
         )
 
 
         if args.no_eval == False:
-            giou, ciou = validate(val_loader, model_engine, epoch, writer, args)
+            giou, ciou = validate(val_loader, model_engine, epoch, logger, args)
             is_best = giou > best_score
             best_score = max(giou, best_score)
             cur_ciou = ciou if is_best else cur_ciou
@@ -505,7 +548,7 @@ def train(
     model,
     epoch,
     scheduler,
-    writer,
+    logger,
     train_iter,
     args,
 ):
@@ -627,30 +670,30 @@ def train(
 
             if args.local_rank == 0:
                 progress.display(local_step + 1)
-                writer.add_scalar("train/loss", losses.avg, model.global_steps)
-                writer.add_scalar("train/ce_loss", ce_losses.avg, model.global_steps)
-                writer.add_scalar(
+                logger.add_scalar("train/loss", losses.avg, model.global_steps)
+                logger.add_scalar("train/ce_loss", ce_losses.avg, model.global_steps)
+                logger.add_scalar(
                     "train/mask_bce_loss", mask_bce_losses.avg, model.global_steps
                 )
-                writer.add_scalar(
+                logger.add_scalar(
                     "train/mask_dice_loss", mask_dice_losses.avg, model.global_steps
                 )
-                writer.add_scalar("train/mask_loss", mask_losses.avg, model.global_steps)
-                writer.add_scalar("train/unscale_mask_bce_losses", unscale_mask_bce_losses.avg, model.global_steps)
-                writer.add_scalar("train/unscale_mask_dice_losses", unscale_mask_dice_losses.avg, model.global_steps)
-                writer.add_scalar("train/unscale_mask_losses", unscale_mask_losses.avg, model.global_steps)
-                writer.add_scalar(
+                logger.add_scalar("train/mask_loss", mask_losses.avg, model.global_steps)
+                logger.add_scalar("train/unscale_mask_bce_losses", unscale_mask_bce_losses.avg, model.global_steps)
+                logger.add_scalar("train/unscale_mask_dice_losses", unscale_mask_dice_losses.avg, model.global_steps)
+                logger.add_scalar("train/unscale_mask_losses", unscale_mask_losses.avg, model.global_steps)
+                logger.add_scalar(
                     "metrics/total_secs_per_batch", batch_time.avg, model.global_steps
                 )
-                writer.add_scalar(
+                logger.add_scalar(
                     "metrics/data_secs_per_batch", data_time.avg, model.global_steps
                 )
-                # writer.add_scalar(
+                # logger.add_scalar(
                 #     "metrics/average_gradient", average_gradient, model.global_steps
                 # )
 
-                writer.add_scalar("train/unscale_mask_iou_losses", unscale_mask_iou_losses.avg, model.global_steps)
-                writer.add_scalar("train/unscale_mask_focal_losses", unscale_mask_focal_losses.avg, model.global_steps)
+                logger.add_scalar("train/unscale_mask_iou_losses", unscale_mask_iou_losses.avg, model.global_steps)
+                logger.add_scalar("train/unscale_mask_focal_losses", unscale_mask_focal_losses.avg, model.global_steps)
 
             batch_time.reset()
             data_time.reset()
@@ -668,7 +711,7 @@ def train(
         if model.global_steps != 0:
             curr_lr = scheduler.get_last_lr()
             if args.local_rank == 0:
-                writer.add_scalar("train/lr", curr_lr[0], model.global_steps)
+                logger.add_scalar("train/lr", curr_lr[0], model.global_steps)
 
 
         if local_step != 0 and local_step % args.save_steps == 0:
@@ -699,7 +742,7 @@ def calculate_iou(prediction_mask, ground_truth_mask):
 
     return iou.item()
 
-def validate(val_loader, model_engine, epoch, writer, args):
+def validate(val_loader, model_engine, epoch, logger, args):
     intersection_meter = AverageMeter("Intersec", ":6.3f", Summary.SUM)
     union_meter = AverageMeter("Union", ":6.3f", Summary.SUM)
     acc_iou_meter = AverageMeter("gIoU", ":6.3f", Summary.SUM)
@@ -768,9 +811,9 @@ def validate(val_loader, model_engine, epoch, writer, args):
     mDice = dice_meter.avg
 
     if args.local_rank == 0 and not args.eval_only:
-        writer.add_scalar("val/giou", giou, epoch)
-        writer.add_scalar("val/ciou", ciou, epoch)
-        writer.add_scalar("val/dice", mDice, epoch)
+        logger.add_scalar("val/giou", giou, epoch)
+        logger.add_scalar("val/ciou", ciou, epoch)
+        logger.add_scalar("val/dice", mDice, epoch)
     print("giou: {:.6f}, ciou: {:.6f}".format(giou, ciou))
     print("miou: {:.6f}, mDice: {:.6f}".format(miou, mDice))
     return giou, ciou

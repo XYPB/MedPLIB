@@ -29,4 +29,5 @@ deepspeed --include=localhost:0,1,2,3 --master_port=65001 train_ds_medplib.py \
   --lr 0.0001 \
   --no_eval \
   --save_steps 400 \
+  --use_wandb \
   2>&1|tee -a runs/$exp_name/$time.log
