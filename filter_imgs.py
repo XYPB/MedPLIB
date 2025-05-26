@@ -21,6 +21,7 @@ for item in tqdm(data):
 
     for conversation in item['conversations']:
         value = conversation['value']
+        print(value)
         if "<region>" in value:
             mask_path = value.split("<region>")[1].split("</region>")[0]
             local_mask_path = os.path.join(IMG_FOLDER, mask_path)
