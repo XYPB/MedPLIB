@@ -66,6 +66,7 @@ if __name__ == "__main__":
     
     # find missing images
     image_list = json.load(open("data/MeCoVQA/train/MeCoVQA-Complex_local+Region_fixed_filtered_missing_images.json", 'r'))
+    print(len(image_list))
     image_list = ["SAMed2Dv1/" + img for img in image_list]
     image_list = sorted(image_list)
     image_list = [img + '.png' for img in image_list if 'png' not in img]
