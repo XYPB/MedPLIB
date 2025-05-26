@@ -69,7 +69,7 @@ if __name__ == "__main__":
     print(len(image_list))
     image_list = ["SAMed2Dv1/" + img for img in image_list]
     image_list = sorted(image_list)
-    image_list = [img + '.png' for img in image_list if 'png' not in img]
+    # image_list = [img + '.png' for img in image_list if 'png' not in img]
     print(image_list[:10])
     print(len(image_list))
     
