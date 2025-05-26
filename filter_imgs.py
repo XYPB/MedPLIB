@@ -2,7 +2,7 @@ import os
 import json
 from tqdm import tqdm
 
-target_json = "/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Complex_local+Region.json"
+target_json = "/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Complex_local+Region_fixed.json"
 data = json.load(open(target_json, 'r'))
 
 IMG_FOLDER = "/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/"
