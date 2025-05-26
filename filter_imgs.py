@@ -18,13 +18,22 @@ for item in tqdm(data):
         continue
     if image_path.startswith('images/'):
         cnt += 1
+
+    for conversation in item['conversations']:
+        value = conversation['value']
+        if "<region>" in value:
+            mask_path = value.split("<region>")[1].split("</region>")[0]
+            local_mask_path = os.path.join(IMG_FOLDER, mask_path)
+            if not os.path.exists(local_mask_path):
+                missing_images.add(mask_path)
+                continue
     filtered_data.append(item)
 
 print(cnt)
 print(f"Total number of data: {len(data)}")
 print(f"Total number of data after filtering: {len(filtered_data)}")
 print(f"Total number of missing images: {len(missing_images)}")
-print(f"Missing images: {list(missing_images)[:100]}")
+print(f"Missing images: {list(missing_images)[:10]}")
 # Save the filtered data to a new JSON file
 if len(missing_images) > 0:
     output_json = target_json.replace('.json', '_filtered.json')
