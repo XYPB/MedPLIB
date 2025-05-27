@@ -3,7 +3,7 @@ import json
 import os
 from PIL import Image
 from tqdm import tqdm
-import pipeline from transformers
+from transformers import pipeline
 
 from transformers import AutoProcessor, AutoModelForImageTextToText
 from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
