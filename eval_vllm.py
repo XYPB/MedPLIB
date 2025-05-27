@@ -5,8 +5,8 @@ from PIL import Image
 from tqdm import tqdm
 from transformers import pipeline
 
-from transformers import AutoProcessor, AutoModelForImageTextToText
-from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
+from transformers import AutoProcessor, AutoModelForImageTextToText, AutoModel
+from transformers import Qwen2_5_VLForConditionalGeneration
 
 torch.set_float32_matmul_precision('high')
 
@@ -17,7 +17,7 @@ if __name__ == "__main__":
     # model_id = "Qwen/Qwen2.5-VL-7B-Instruct"
     model_id = "OpenGVLab/InternVL3-8B"
 
-    model = AutoModelForImageTextToText.from_pretrained(
+    model = AutoModel.from_pretrained(
         model_id,
         torch_dtype=torch.bfloat16,
         device_map="auto",
