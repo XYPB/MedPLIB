@@ -1,0 +1,23 @@
+#!/bin/bash
+
+#SBATCH --job-name=eval_qwen
+#SBATCH --comment="Evaluation of Qwen-VL2-5"
+#SBATCH --time=1-00:00:00
+#SBATCH --mail-type=FAIL
+#SBATCH --mail-type=END
+#SBATCH --mail-user=yuexi.du@yale.edu
+
+#SBATCH --account prio_dvornek
+#SBATCH --ntasks=1
+#SBATCH --cpus-per-task=8
+#SBATCH --mem-per-cpu=6g
+#SBATCH --partition priority_gpu
+#SBATCH --nodes 1
+#SBATCH --gpus a5000:1
+
+cd ~/project/MedPLIB
+module load miniconda
+conda activate vllm
+git pull
+
+python eval_vllm.py --model qwen --num_samples -1
