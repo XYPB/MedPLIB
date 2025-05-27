@@ -14,7 +14,8 @@ if __name__ == "__main__":
     # dummy test
 
     # model_id = "google/medgemma-4b-it"
-    model_id = "Qwen/Qwen2.5-VL-7B-Instruct"
+    # model_id = "Qwen/Qwen2.5-VL-7B-Instruct"
+    model_id = "OpenGVLab/InternVL3-8B"
 
     model = AutoModelForImageTextToText.from_pretrained(
         model_id,
@@ -49,7 +50,7 @@ if __name__ == "__main__":
     input_len = inputs["input_ids"].shape[-1]
 
     with torch.inference_mode():
-        generation = model.generate(**inputs, max_new_tokens=200, do_sample=False)
+        generation = model.generate(**inputs, max_new_tokens=500, do_sample=False)
         generation = generation[0][input_len:]
 
     decoded = processor.decode(generation, skip_special_tokens=True)
