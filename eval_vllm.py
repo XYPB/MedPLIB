@@ -8,7 +8,11 @@ from transformers import pipeline
 from copy import deepcopy
 
 from transformers import AutoProcessor, AutoModelForImageTextToText, AutoModel
-from transformers import Qwen2_5_VLForConditionalGeneration
+import argparse
+
+parser = argparse.ArgumentParser(description="Evaluate VLLM models on MeCoVQA dataset")
+parser.add_argument("--model", type=str, choices=["medgemma", "qwen"], required=True, help="Model to evaluate: 'medgemma' or 'qwen'")
+parser.add_argument("--num_samples", type=int, default=10, help="Number of samples to evaluate (default: 10)")
 
 torch.set_float32_matmul_precision('high')
 torch.backends.cuda.enable_flash_sdp(True)
@@ -167,6 +171,7 @@ def eval_qwen_vl(conversations, gts):
     return outputs
 
 if __name__ == "__main__":
+    args = parser.parse_args()
     # Create a timestamped directory for this run
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
     output_dir = os.path.join("./runs/output", f"eval_{timestamp}")
@@ -176,77 +181,71 @@ if __name__ == "__main__":
     conversations, gts = parse_json_to_conversations(json_to_eval)
     
     # Number of samples to evaluate
-    num_samples = 5
+    num_samples = args.num_samples if args.num_samples > 0 else len(conversations)
     # Save evaluation configuration
+    if args.model == "medgemma":
+        model_config = {
+                "name": "google/medgemma-4b-it",
+                "processing": "Sequential"
+            },
+    elif args.model == "qwen":
+        model_config = {
+                "name": "Qwen/Qwen2.5-VL-7B-Instruct",
+                "processing": "Sequential"
+            }
     config = {
         "timestamp": timestamp,
         "dataset": json_to_eval,
         "num_samples": num_samples,
-        "models": [
-            {
-                "name": "google/medgemma-4b-it",
-                "processing": "Sequential"
-            },
-            {
-                "name": "Qwen/Qwen2.5-VL-7B-Instruct",
-                "processing": "Sequential"
-            }
-        ]
+        "models": model_config
     }
     config_path = os.path.join(output_dir, "eval_config.json")
     with open(config_path, 'w') as f:
         json.dump(config, f, indent=2)
-      # Evaluate MedGemma
-    print(f"Evaluating MedGemma on {num_samples} samples...")
-    medgemma_outputs = eval_medgemma(deepcopy(conversations)[:num_samples], gts[:num_samples])
-    medgemma_model_info = {
-        "model_name": "google/medgemma-4b-it",
-        "model_type": "Image-Text-to-Text",
-        "batch_size": "N/A (Sequential processing)"
-    }
-    medgemma_output_path = save_outputs_to_json(
-        medgemma_outputs, 
-        "medgemma_outputs.json", 
-        output_dir,
-        medgemma_model_info
-    )
+
+    # Evaluate MedGemma
+    if args.model == "medgemma":
+        print(f"Evaluating MedGemma on {num_samples} samples...")
+        medgemma_outputs = eval_medgemma(deepcopy(conversations)[:num_samples], gts[:num_samples])
+        medgemma_model_info = {
+            "model_name": "google/medgemma-4b-it",
+            "model_type": "Image-Text-to-Text",
+            "batch_size": "N/A (Sequential processing)"
+        }
+        medgemma_output_path = save_outputs_to_json(
+            medgemma_outputs, 
+            "medgemma_outputs.json", 
+            output_dir,
+            medgemma_model_info
+        )
+    elif args.model == "qwen":
     
-    # Evaluate Qwen-VL
-    print(f"Evaluating Qwen-VL on {num_samples} samples...")
-    qwen_outputs = eval_qwen_vl(deepcopy(conversations)[:num_samples], gts[:num_samples])
-    qwen_model_info = {
-        "model_name": "Qwen/Qwen2.5-VL-7B-Instruct",
-        "model_type": "Image-Text-to-Text",
-        "batch_size": "N/A (Sequential processing)"
-    }
-    qwen_output_path = save_outputs_to_json(
-        qwen_outputs, 
-        "qwen_outputs.json", 
-        output_dir,
-        qwen_model_info
-    )
+        # Evaluate Qwen-VL
+        print(f"Evaluating Qwen-VL on {num_samples} samples...")
+        qwen_outputs = eval_qwen_vl(deepcopy(conversations)[:num_samples], gts[:num_samples])
+        qwen_model_info = {
+            "model_name": "Qwen/Qwen2.5-VL-7B-Instruct",
+            "model_type": "Image-Text-to-Text",
+            "batch_size": "N/A (Sequential processing)"
+        }
+        qwen_output_path = save_outputs_to_json(
+            qwen_outputs, 
+            "qwen_outputs.json", 
+            output_dir,
+            qwen_model_info
+        )
     
-    # Save ground truth outputs for reference
-    gt_info = {
-        "source": json_to_eval,
-        "dataset": "MeCoVQA"
-    }
-    gt_output_path = save_outputs_to_json(
-        gts[:num_samples], 
-        "ground_truth.json", 
-        output_dir,
-        gt_info
-    )
     
-    # Print examples
-    print("\n### MedGemma Output Example:")
-    print(medgemma_outputs[0])
     
-    print("\n### Qwen-VL Output Example:")
-    print(qwen_outputs[0])
+    # # Print examples
+    # print("\n### MedGemma Output Example:")
+    # print(medgemma_outputs[0])
     
-    print("\n### Ground Truth Example:")
-    print(gts[0])
+    # print("\n### Qwen-VL Output Example:")
+    # print(qwen_outputs[0])
+    
+    # print("\n### Ground Truth Example:")
+    # print(gts[0])
     
     print(f"\nAll outputs saved to: {output_dir}")
 
