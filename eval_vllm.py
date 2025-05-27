@@ -13,7 +13,8 @@ from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
 if __name__ == "__main__":
     # dummy test
 
-    model_id = "google/medgemma-4b-it"
+    # model_id = "google/medgemma-4b-it"
+    model_id = "Qwen/Qwen2.5-VL-7B-Instruct"
 
     model = AutoModelForImageTextToText.from_pretrained(
         model_id,
