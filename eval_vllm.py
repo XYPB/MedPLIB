@@ -35,7 +35,7 @@ if __name__ == "__main__":
         {
             "role": "user",
             "content": [
-                {"type": "text", "text": "Can you provide an description of the overall findings from this image?"},
+                {"type": "text", "text": "Can you provide an interpretation of the overall findings from this image?"},
                 {"type": "image", "image": image},
             ]
         },
