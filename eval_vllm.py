@@ -29,12 +29,12 @@ if __name__ == "__main__":
     messages = [
         {
             "role": "system",
-            "content": [{"type": "text", "text": "You are an expert clinician in brain MRI."}]
+            "content": [{"type": "text", "text": "You are an expert radiologist."}]
         },
         {
             "role": "user",
             "content": [
-                {"type": "text", "text": "Can you provide an interpretation of the overall findings from this image?"},
+                {"type": "text", "text": "Can you provide an description of the overall findings from this image?"},
                 {"type": "image", "image": image},
             ]
         },
@@ -53,4 +53,6 @@ if __name__ == "__main__":
 
     decoded = processor.decode(generation, skip_special_tokens=True)
     print(decoded)
+
+    target_output = "The sagittal MRI scan reveals the presence of edema and non-enhancing and enhancing tumors in the head and neck region. Edema is characterized by abnormal accumulation of fluid, while tumors show abnormal growth in the tissues. Further analysis and treatment planning are recommended based on these findings."
 
