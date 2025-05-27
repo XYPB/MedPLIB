@@ -93,7 +93,7 @@ def eval_medgemma(conversations, gts):
     outputs = []
 
     # Process conversations one by one
-    for idx, messages in tqdm(enumerate(conversations), desc="Processing with MedGemma"):
+    for idx, messages in tqdm(enumerate(conversations), desc="Processing with MedGemma", total=len(conversations)):
         # Prepare the input
         image_path = messages[1]['content'][1]['image']
         image = Image.open(image_path)
@@ -136,7 +136,7 @@ def eval_qwen_vl(conversations, gts):
     outputs = []
 
     # Process conversations one by one
-    for idx, messages in tqdm(enumerate(conversations), desc="Processing with Qwen-VL"):
+    for idx, messages in tqdm(enumerate(conversations), desc="Processing with Qwen-VL", total=len(conversations)):
         # Prepare the input
         image_path = messages[1]['content'][1]['image']
         image = Image.open(image_path)
