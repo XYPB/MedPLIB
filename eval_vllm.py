@@ -18,7 +18,7 @@ if __name__ == "__main__":
     # model_id = "Qwen/Qwen2.5-VL-7B-Instruct"
     # model_id = "OpenGVLab/InternVL3-8B"
 
-    model = AutoModel.from_pretrained(
+    model = AutoModelForImageTextToText.from_pretrained(
         model_id,
         torch_dtype=torch.bfloat16,
         device_map="auto",
