@@ -21,6 +21,7 @@ if __name__ == "__main__":
         model_id,
         torch_dtype=torch.bfloat16,
         device_map="auto",
+        trust_remote_code=True
     )
     processor = AutoProcessor.from_pretrained(model_id)
 
