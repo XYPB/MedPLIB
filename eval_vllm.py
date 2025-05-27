@@ -8,7 +8,7 @@ from transformers import pipeline
 from transformers import AutoProcessor, AutoModelForImageTextToText
 from transformers import AutoProcessor, Qwen2_5_VLForConditionalGeneration
 
-
+torch.set_float32_matmul_precision('high')
 
 if __name__ == "__main__":
     # dummy test
