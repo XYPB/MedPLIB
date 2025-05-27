@@ -9,13 +9,14 @@ from transformers import AutoProcessor, AutoModelForImageTextToText, AutoModel
 from transformers import Qwen2_5_VLForConditionalGeneration
 
 torch.set_float32_matmul_precision('high')
+torch.backends.cuda.enable_flash_sdp(True)
 
 if __name__ == "__main__":
     # dummy test
 
-    # model_id = "google/medgemma-4b-it"
+    model_id = "google/medgemma-4b-it"
     # model_id = "Qwen/Qwen2.5-VL-7B-Instruct"
-    model_id = "OpenGVLab/InternVL3-8B"
+    # model_id = "OpenGVLab/InternVL3-8B"
 
     model = AutoModel.from_pretrained(
         model_id,
