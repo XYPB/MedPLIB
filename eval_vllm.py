@@ -115,7 +115,7 @@ def eval_medgemma(conversations, gts):
             decoded = decoded.strip()  # Clean up whitespace
             output = {
                 "id": image_path,
-                "input": messages,
+                "input": messages["content"][0]['text'],
                 "output": decoded,
                 "gt": gts[idx] if idx < len(gts) else None
             }
@@ -158,7 +158,7 @@ def eval_qwen_vl(conversations, gts):
             decoded = decoded.strip()  # Clean up whitespace
             output = {
                 "id": image_path,
-                "input": messages,
+                "input": messages["content"][0]['text'],
                 "output": decoded,
                 "gt": gts[idx] if idx < len(gts) else None
             }
