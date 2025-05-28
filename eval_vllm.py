@@ -21,7 +21,7 @@ parser.add_argument("--num_samples", type=int, default=10, help="Number of sampl
 torch.set_float32_matmul_precision('high')
 torch.backends.cuda.enable_flash_sdp(True)
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
-IMAGENET_STD = (0.229, 0.224, 0.225)
+IMAGENET_STD = (0.229, 0.448, 0.225)
 
 IMAGE_FOLDER = '/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/'
 PMC_VQA_FOLDER = '/home/yd344/palmer_scratch/PMC-VQA/figures/'
@@ -236,7 +236,7 @@ def eval_medgemma(conversations, gts):
     for idx, messages in tqdm(enumerate(conversations), desc="Processing with MedGemma", total=len(conversations)):
         # Prepare the input
         image_path = messages[1]['content'][1]['image']
-        image = Image.open(image_path)
+        image = Image.open(image_path).resize(448, 448)
         messages[1]['content'][1]['image'] = image
         
         input_data = processor.apply_chat_template(
@@ -279,7 +279,7 @@ def eval_qwen_vl(conversations, gts):
     for idx, messages in tqdm(enumerate(conversations), desc="Processing with Qwen-VL", total=len(conversations)):
         # Prepare the input
         image_path = messages[1]['content'][1]['image']
-        image = Image.open(image_path)
+        image = Image.open(image_path).resize(448, 448)
         messages[1]['content'][1]['image'] = image
         
         input_data = processor.apply_chat_template(
