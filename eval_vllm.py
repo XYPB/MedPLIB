@@ -454,7 +454,7 @@ def eval_llava_med(conversations, gts):
             inputs = tokenizer(
                 prompt, 
                 return_tensors="pt", 
-                max_length=context_len,
+                max_length=1024,
                 truncation=True,
             ).to(model.device)
 
