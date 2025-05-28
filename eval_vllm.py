@@ -308,7 +308,7 @@ def eval_qwen_vl(conversations, gts):
 
 def eval_intern_vl(conversations, gts):
     # Note: batch_size parameter is kept for compatibility but not used
-    path = "OpenGVLab/InternVL2_5-8B"
+    path = "OpenGVLab/InternVL3-8B"
     model = AutoModel.from_pretrained(
         path,
         torch_dtype=torch.bfloat16,
