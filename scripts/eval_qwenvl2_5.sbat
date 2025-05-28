@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=eval_qwen
 #SBATCH --comment="Evaluation of Qwen-VL2-5"
-#SBATCH --time=1-00:00:00
+#SBATCH --time=2-00:00:00
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-type=END
 #SBATCH --mail-user=yuexi.du@yale.edu
