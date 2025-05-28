@@ -10,7 +10,7 @@ from copy import deepcopy
 from torchvision.transforms.functional import InterpolationMode
 import pandas as pd
 
-from transformers import AutoProcessor, AutoModelForImageTextToText, AutoModel, AutoTokenizer
+from transformers import AutoProcessor, AutoModelForImageTextToText, AutoModel, AutoTokenizer, AutoModelForCausalLM
 import argparse
 
 parser = argparse.ArgumentParser(description="Evaluate VLLM models on MeCoVQA dataset")
@@ -309,7 +309,7 @@ def eval_qwen_vl(conversations, gts):
 def eval_intern_vl(conversations, gts):
     # Note: batch_size parameter is kept for compatibility but not used
     path = "OpenGVLab/InternVL2_5-8B"
-    model = AutoModel.from_pretrained(
+    model = AutoModelForCausalLM.from_pretrained(
         path,
         torch_dtype=torch.bfloat16,
         low_cpu_mem_usage=True,
