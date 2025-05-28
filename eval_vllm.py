@@ -127,6 +127,10 @@ def parse_omnimedvqa_jsons(json_dir):
                 gt_output = entry['gt_answer']
                 image_path = os.path.join(OmniMedVQA_FOLDER, entry['image_path'])
 
+                if 'option_A' not in entry or 'option_B' not in entry or 'option_C' not in entry or 'option_D' not in entry:
+                    print(f"Skipping entry {entry['question_id']} due to missing options.")
+                    continue
+
                 choices = [entry['option_A'], entry['option_B'], entry['option_C'], entry['option_D']]
 
                 if gt_output == choices[0]:
