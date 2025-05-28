@@ -100,7 +100,9 @@ def load_image(image_file, input_size=448, max_num=12):
     return pixel_values
 
 def parse_omnimedvqa_jsons(json_dir):
+    print(json_dir)
     json_list = glob(os.path.join(json_dir, '*.json'))
+    print(json_list)
     multi_choice_conversations = []
     mc_GT_outputs = []
     mc_message_template = [
@@ -117,7 +119,7 @@ def parse_omnimedvqa_jsons(json_dir):
         },
     ]
     
-    for json_file in json_list:
+    for json_file in tqdm(json_list):
         with open(json_file, 'r') as f:
             for entry in json.load(f):
                 question = entry['question']
@@ -144,6 +146,7 @@ def parse_omnimedvqa_jsons(json_dir):
                 mc_message[1]['content'][1]['image'] = image_path
                 multi_choice_conversations.append(mc_message)
                 mc_GT_outputs.append(gt_choice)
+    print(f"Total multi-choice conversations: {len(multi_choice_conversations)}")
 
     return multi_choice_conversations, mc_GT_outputs
 
