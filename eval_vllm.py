@@ -430,14 +430,14 @@ def eval_llava_med(conversations, gts):
         model_name='llava-med-v1.5-mistral-7b'
     )
 
-    model = model.eval().cuda().to(torch.bfloat16)
+    model = model.eval().cuda()
     outputs = []
 
     for idx, messages in tqdm(enumerate(conversations), desc="Processing with LLaVA-Med", total=len(conversations)):
         # Prepare the input
         image_path = messages[1]['content'][1]['image']
         image = Image.open(image_path).convert('RGB')
-        image_tensor = image_processor(images=image, return_tensors="pt").pixel_values.to(model.device, dtype=torch.bfloat16)
+        image_tensor = image_processor(images=image, return_tensors="pt").pixel_values.to(model.device, dtype=model.dtype)
         messages[1]['content'][1]['image'] = image
         question = "<image>\n" + messages[1]['content'][0]['text']
         system_prompt = messages[0]["content"][0]["text"]
@@ -450,7 +450,7 @@ def eval_llava_med(conversations, gts):
 
         # Generate the response
         with torch.inference_mode():
-            input_ids = tokenizer(prompt, return_tensors="pt", max_length=context_len).input_ids.to(model.device, dtype=torch.bfloat16)
+            input_ids = tokenizer(prompt, return_tensors="pt", max_length=context_len).input_ids.to(model.device, dtype=model.dtype)
 
             output_ids  = model.generate(input_ids, images=image_tensor, max_new_tokens=1024, do_sample=False)
             decoded = tokenizer.decode(output_ids[0][input_ids.shape[1]:], skip_special_tokens=True)
