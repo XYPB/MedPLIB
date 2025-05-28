@@ -351,11 +351,11 @@ if __name__ == "__main__":
     os.makedirs(output_dir, exist_ok=True)
     
     if args.dataset == "PMC-VQA":
-        csv_path = "/home/yd344/palmer_scratch/PMC-VQA/test_2.csv"
-        _, _, conversations, gts = parser_pmc_vqa_to_multi_choice_conversations(csv_path)
+        data_path = "/home/yd344/palmer_scratch/PMC-VQA/test_2.csv"
+        _, _, conversations, gts = parser_pmc_vqa_to_multi_choice_conversations(data_path)
     elif args.dataset == "MeCoVQA":
-        json_to_eval = 'data/MeCoVQA/test/MeCoVQA_Complex_VQA_test.json'
-        conversations, gts = parse_json_to_conversations(json_to_eval)
+        data_path = 'data/MeCoVQA/test/MeCoVQA_Complex_VQA_test.json'
+        conversations, gts = parse_json_to_conversations(data_path)
     
     # Number of samples to evaluate
     num_samples = args.num_samples if args.num_samples > 0 else len(conversations)
@@ -372,7 +372,7 @@ if __name__ == "__main__":
             }
     config = {
         "timestamp": timestamp,
-        "dataset": json_to_eval,
+        "dataset": data_path,
         "num_samples": num_samples,
         "models": model_config
     }
