@@ -325,7 +325,7 @@ def eval_intern_vl(conversations, gts):
     for idx, messages in tqdm(enumerate(conversations), desc="Processing with Intern-VL", total=len(conversations)):
         # Prepare the input
         image_path = messages[1]['content'][1]['image']
-        image = load_image('./examples/image1.jpg', max_num=12).to(torch.bfloat16).cuda()
+        image = load_image(image_path, max_num=12).to(torch.bfloat16).cuda()
         messages[1]['content'][1]['image'] = image
         question = "<image>\n" + messages[1]['content'][0]['text']
 
