@@ -411,8 +411,21 @@ if __name__ == "__main__":
             output_dir,
             qwen_model_info
         )
-    
-    
+    elif args.model == "internvl":
+        # Evaluate Intern-VL
+        print(f"Evaluating Intern-VL on {num_samples} samples...")
+        intern_outputs = eval_intern_vl(deepcopy(conversations)[:num_samples], gts[:num_samples])
+        intern_model_info = {
+            "model_name": "OpenGVLab/InternVL2_5-8B",
+            "model_type": "Image-Text-to-Text",
+            "batch_size": "N/A (Sequential processing)"
+        }
+        intern_output_path = save_outputs_to_json(
+            intern_outputs, 
+            "intern_outputs.json", 
+            output_dir,
+            intern_model_info
+        )
     
     # # Print examples
     # print("\n### MedGemma Output Example:")
