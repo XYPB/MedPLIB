@@ -2,7 +2,7 @@
 
 #SBATCH --job-name=eval_medgemma
 #SBATCH --comment="Evaluation of MedGemma"
-#SBATCH --time=2-00:00:00
+#SBATCH --time=1-00:00:00
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-type=END
 #SBATCH --mail-user=yuexi.du@yale.edu
@@ -21,4 +21,5 @@ conda activate vllm
 git pull
 
 # python eval_vllm.py --model medgemma --num_samples -1
-python eval_vllm.py --model medgemma --num_samples -1 --dataset "PMC-VQA"
+# python eval_vllm.py --model medgemma --num_samples -1 --dataset "PMC-VQA"
+python eval_vllm.py --model medgemma --num_samples -1 --dataset "OmniMedVQA"

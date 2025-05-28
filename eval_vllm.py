@@ -402,7 +402,8 @@ if __name__ == "__main__":
     args = parser.parse_args()
     # Create a timestamped directory for this run
     timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
-    output_dir = os.path.join("./runs/output", f"eval_{timestamp}")
+    size = "full" if args.num_samples <= 0 else args.num_samples
+    output_dir = os.path.join("./runs/output", f"eval_{timestamp}_{args.dataset}_{size}_{args.model}")
     os.makedirs(output_dir, exist_ok=True)
     
     if args.dataset == "PMC-VQA":

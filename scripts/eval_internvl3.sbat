@@ -1,8 +1,8 @@
 #!/bin/bash
 
-#SBATCH --job-name=eval_qwen
-#SBATCH --comment="Evaluation of Qwen-VL2-5"
-#SBATCH --time=1-00:00:00
+#SBATCH --job-name=eval_internvl3
+#SBATCH --comment="Evaluation of InternVL3"
+#SBATCH --time=2-00:00:00
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-type=END
 #SBATCH --mail-user=yuexi.du@yale.edu
@@ -20,6 +20,6 @@ module load miniconda
 conda activate vllm
 git pull
 
-# python eval_vllm.py --model qwen --num_samples -1
-# python eval_vllm.py --model qwen --num_samples -1 --dataset "PMC-VQA"
-python eval_vllm.py --model qwen --num_samples -1 --dataset "OmniMedVQA"
+python eval_vllm.py --model internvl --num_samples -1
+python eval_vllm.py --model internvl --num_samples -1 --dataset "PMC-VQA"
+python eval_vllm.py --model internvl --num_samples -1 --dataset "OmniMedVQA"
