@@ -14,7 +14,7 @@ from transformers import AutoProcessor, AutoModelForImageTextToText, AutoModel, 
 import argparse
 
 parser = argparse.ArgumentParser(description="Evaluate VLLM models on MeCoVQA dataset")
-parser.add_argument("--model", type=str, choices=["medgemma", "qwen", "internvl"], required=True, help="Model to evaluate: 'medgemma' or 'qwen'")
+parser.add_argument("--model", type=str, choices=["medgemma", "qwen", "internvl", 'llava_med'], required=True, help="Model to evaluate: 'medgemma' or 'qwen'")
 parser.add_argument("--dataset", type=str, default="MeCoVQA", help="Dataset to evaluate on (default: MeCoVQA)")
 parser.add_argument("--num_samples", type=int, default=10, help="Number of samples to evaluate (default: 10)")
 
@@ -420,12 +420,57 @@ def eval_intern_vl(conversations, gts):
 
     return outputs
 
-def eval_med_llava(conversations, gts):
-    from llava.model.language_model.llava_llama import LlavaLlamaForCausalLM
+def eval_llava_med(conversations, gts):
+    from llava.model.builder import load_pretrained_model
     from llava.conversation import conv_templates
 
+    tokenizer, model, image_processor, context_len = load_pretrained_model(
+        model_path='/home/yd344/palmer_scratch/huggingface_models/llava-med-v1.5-mistral-7b',
+        model_base=None,
+        model_name='llava-med-v1.5-mistral-7b'
+    )
 
+    outputs = []
 
+    for idx, messages in tqdm(enumerate(conversations), desc="Processing with LLaVA-Med", total=len(conversations)):
+        # Prepare the input
+        image_path = messages[1]['content'][1]['image']
+        image = Image.open(image_path).convert('RGB')
+        image_tensor = image_processor(images=image, return_tensors="pt").pixel_values.to(model.device, dtype=torch.bfloat16)
+        messages[1]['content'][1]['image'] = image
+        question = "<image>\n" + messages[1]['content'][0]['text']
+        system_prompt = messages[0]["content"][0]["text"]
+
+        conv = conv_templates['mistral_instruct'].copy()
+        conv.system = system_prompt
+        conv.append_message(conv.roles[0], question)
+        conv.append_message(conv.roles[1], None)  # Placeholder for the model's response
+        prompt = conv.get_prompt()
+
+        # Generate the response
+        with torch.inference_mode():
+            input_ids = tokenizer(
+                prompt,
+                images=image,
+                return_tensors="pt",
+                padding=True,
+                truncation=True,
+                max_length=context_len
+            ).input_ids.to(model.device, dtype=torch.bfloat16)
+
+            output_ids  = model.generate(input_ids, images=image_tensor, max_new_tokens=1024, do_sample=False)
+            decoded = tokenizer.decode(output_ids[0][input_ids.shape[1]:], skip_special_tokens=True)
+            decoded = decoded.strip()
+
+            output = {
+                "id": image_path,
+                "input": messages[1]["content"][0]['text'],
+                "output": decoded,
+                "gt": gts[idx] if idx < len(gts) else None
+            }
+            outputs.append(output)
+
+    return outputs
 
 
 if __name__ == "__main__":
@@ -469,6 +514,13 @@ if __name__ == "__main__":
             "name": "OpenGVLab/InternVL2_5-8B",
             "processing": "Sequential"
         }
+    elif args.model == "llava_med":
+        model_config = {
+            "name": "llava-med-v1.5-mistral-7b",
+            "processing": "Sequential"
+        }
+    else:
+        raise ValueError(f"Unsupported model: {args.model}. Supported models are: medgemma, qwen, internvl, llava_med.")
     config = {
         "timestamp": timestamp,
         "dataset": data_path,
@@ -525,16 +577,21 @@ if __name__ == "__main__":
             output_dir,
             intern_model_info
         )
-    
-    # # Print examples
-    # print("\n### MedGemma Output Example:")
-    # print(medgemma_outputs[0])
-    
-    # print("\n### Qwen-VL Output Example:")
-    # print(qwen_outputs[0])
-    
-    # print("\n### Ground Truth Example:")
-    # print(gts[0])
+    elif args.model == "llava_med":
+        # Evaluate LLaVA-Med
+        print(f"Evaluating LLaVA-Med on {num_samples} samples...")
+        llava_outputs = eval_llava_med(deepcopy(conversations)[:num_samples], gts[:num_samples])
+        llava_model_info = {
+            "model_name": "llava-med-v1.5-mistral-7b",
+            "model_type": "Image-Text-to-Text",
+            "batch_size": "N/A (Sequential processing)"
+        }
+        llava_output_path = save_outputs_to_json(
+            llava_outputs, 
+            "llava_outputs.json", 
+            output_dir,
+            llava_model_info
+        )
     
     print(f"\nAll outputs saved to: {output_dir}")
 
