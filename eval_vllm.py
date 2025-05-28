@@ -124,25 +124,19 @@ def parse_omnimedvqa_jsons(json_dir):
                 gt_output = entry['gt_answer']
                 image_path = os.path.join(OmniMedVQA_FOLDER, entry['image_path'])
 
-                if 'option_A' not in entry or 'option_B' not in entry or 'option_C' not in entry or 'option_D' not in entry:
-                    print(f"Skipping entry {entry['question_id']} due to missing options.")
-                    continue
+                option_cnt = 0
+                choices = []
+                gt_choice = ''
+                for key in entry.keys():
+                    if key.startswith('option_'):
+                        option_cnt += 1
+                        choices.append(entry[key])
+                        if entry[key] == gt_output:
+                            gt_choice = chr(ord('A') + option_cnt - 1)
 
-                choices = [entry['option_A'], entry['option_B'], entry['option_C'], entry['option_D']]
-
-                if gt_output == choices[0]:
-                    gt_choice = 'A'
-                elif gt_output == choices[1]:
-                    gt_choice = 'B'
-                elif gt_output == choices[2]:
-                    gt_choice = 'C'
-                elif gt_output == choices[3]:
-                    gt_choice = 'D'
-                else:
-                    print(f"GT output '{gt_output}' does not match any choices for question: {question}")
-                    continue
-
-                mc_text = f"{question} Please choice from one of the answers below.\nA. {choices[0]}\nB. {choices[1]}\nC. {choices[2]}\nD. {choices[3]}"
+                mc_text = f"{question} Please choice from one of the answers below."
+                for i, choice in enumerate(choices):
+                    mc_text += f"\n{chr(ord('A') + i)}. {choice}"
                 mc_message = deepcopy(mc_message_template)
                 mc_message[1]['content'][0]['text'] = mc_text
                 mc_message[1]['content'][1]['image'] = image_path
