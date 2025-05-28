@@ -309,7 +309,7 @@ def eval_qwen_vl(conversations, gts):
 def eval_intern_vl(conversations, gts):
     # Note: batch_size parameter is kept for compatibility but not used
     path = "OpenGVLab/InternVL2_5-8B"
-    model = AutoModelForCausalLM.from_pretrained(
+    model = AutoModel.from_pretrained(
         path,
         torch_dtype=torch.bfloat16,
         low_cpu_mem_usage=True,
@@ -342,6 +342,12 @@ def eval_intern_vl(conversations, gts):
             outputs.append(output)
 
     return outputs
+
+def eval_med_llava(conversations, gts):
+    # pipe = pipeline("image-text-to-text", model="microsoft/llava-med-v1.5-mistral-7b")
+    pass
+
+
 
 if __name__ == "__main__":
     args = parser.parse_args()
