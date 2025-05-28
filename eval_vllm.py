@@ -14,7 +14,7 @@ from transformers import AutoProcessor, AutoModelForImageTextToText, AutoModel, 
 import argparse
 
 parser = argparse.ArgumentParser(description="Evaluate VLLM models on MeCoVQA dataset")
-parser.add_argument("--model", type=str, choices=["medgemma", "qwen"], required=True, help="Model to evaluate: 'medgemma' or 'qwen'")
+parser.add_argument("--model", type=str, choices=["medgemma", "qwen", "internvl"], required=True, help="Model to evaluate: 'medgemma' or 'qwen'")
 parser.add_argument("--dataset", type=str, default="MeCoVQA", help="Dataset to evaluate on (default: MeCoVQA)")
 parser.add_argument("--num_samples", type=int, default=10, help="Number of samples to evaluate (default: 10)")
 
