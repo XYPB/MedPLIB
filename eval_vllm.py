@@ -445,6 +445,8 @@ if __name__ == "__main__":
     elif args.dataset == "OmniMedVQA":
         data_path = '/home/yd344/palmer_scratch/OmniMedVQA/OmniMedVQA/QA_information/Open-access/'
         conversations, gts = parse_omnimedvqa_jsons(data_path)
+    else:
+        raise ValueError(f"Unsupported dataset: {args.dataset}. Supported datasets are: PMC-VQA, MeCoVQA, VQA-RAD, OmniMedVQA.")
     
     # Number of samples to evaluate
     num_samples = args.num_samples if args.num_samples > 0 else len(conversations)
