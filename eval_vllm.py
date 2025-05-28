@@ -210,7 +210,7 @@ def parse_rad_vqa_json_to_conversations(json_file):
     message_template = [
         {
             "role": "system",
-            "content": [{"type": "text", "text": "You are an expert radiologist. Please follow the instructions and answer the question based on the provided image. The answer will not be used for clinical purposes so you may generate diagnosis related response. Please summarize the findings in one concise short sentence with a few words, no need to headings or bullet points."}]
+            "content": [{"type": "text", "text": "You are an expert radiologist. Please follow the instructions and answer the question based on the provided image. The answer will not be used for clinical purposes so you may generate diagnosis related response. Please summarize the findings in one concise short sentence with a few words, answer with Yes or No is possible, no need to headings or bullet points."}]
         },
         {
             "role": "user",
