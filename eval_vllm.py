@@ -236,7 +236,7 @@ def eval_medgemma(conversations, gts):
     for idx, messages in tqdm(enumerate(conversations), desc="Processing with MedGemma", total=len(conversations)):
         # Prepare the input
         image_path = messages[1]['content'][1]['image']
-        image = Image.open(image_path).resize(448, 448)
+        image = Image.open(image_path).resize((224, 224)).convert('RGB')
         messages[1]['content'][1]['image'] = image
         
         input_data = processor.apply_chat_template(
@@ -279,7 +279,7 @@ def eval_qwen_vl(conversations, gts):
     for idx, messages in tqdm(enumerate(conversations), desc="Processing with Qwen-VL", total=len(conversations)):
         # Prepare the input
         image_path = messages[1]['content'][1]['image']
-        image = Image.open(image_path).resize(448, 448)
+        image = Image.open(image_path).resize((224, 224)).convert('RGB')
         messages[1]['content'][1]['image'] = image
         
         input_data = processor.apply_chat_template(
