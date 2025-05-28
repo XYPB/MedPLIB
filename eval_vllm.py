@@ -430,6 +430,7 @@ def eval_llava_med(conversations, gts):
         model_name='llava-med-v1.5-mistral-7b'
     )
 
+    model = model.eval().cuda().to(torch.bfloat16)
     outputs = []
 
     for idx, messages in tqdm(enumerate(conversations), desc="Processing with LLaVA-Med", total=len(conversations)):
