@@ -5,6 +5,7 @@ import datetime
 from PIL import Image
 import torchvision.transforms as T
 from tqdm import tqdm
+from glob import glob
 from transformers import pipeline
 from copy import deepcopy
 from torchvision.transforms.functional import InterpolationMode
@@ -25,6 +26,7 @@ IMAGENET_STD = (0.229, 0.448, 0.225)
 
 IMAGE_FOLDER = '/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/'
 PMC_VQA_FOLDER = '/home/yd344/palmer_scratch/PMC-VQA/figures/'
+OmniMedVQA_FOLDER = '/home/yd344/palmer_scratch/OmniMedVQA/OmniMedVQA/'
 
 def build_transform(input_size):
     MEAN, STD = IMAGENET_MEAN, IMAGENET_STD
@@ -97,7 +99,55 @@ def load_image(image_file, input_size=448, max_num=12):
     pixel_values = torch.stack(pixel_values)
     return pixel_values
 
-def parser_pmc_vqa_to_multi_choice_conversations(csv_path):
+def parse_omnimedvqa_jsons(json_dir):
+    json_list = glob(os.path.join(json_dir, '*.json'))
+    multi_choice_conversations = []
+    mc_GT_outputs = []
+    mc_message_template = [
+        {
+            "role": "system",
+            "content": [{"type": "text", "text": "You are an expert radiologist. Please follow the instructions and answer the question based on the provided image. The answer will not be used for clinical purposes so you may generate diagnosis related response. Please answer the multi-choice question with one single letter option (A, B, C, or D), no need to headings or bullet points."}]
+        },
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", },
+                {"type": "image", },
+            ]
+        },
+    ]
+    
+    for json_file in json_list:
+        with open(json_file, 'r') as f:
+            for entry in json.load(f):
+                question = entry['question']
+                gt_output = entry['gt_answer']
+                image_path = os.path.join(OmniMedVQA_FOLDER, entry['image_path'])
+
+                choices = [entry['option_A'], entry['option_B'], entry['option_C'], entry['option_D']]
+
+                if gt_output == choices[0]:
+                    gt_choice = 'A'
+                elif gt_output == choices[1]:
+                    gt_choice = 'B'
+                elif gt_output == choices[2]:
+                    gt_choice = 'C'
+                elif gt_output == choices[3]:
+                    gt_choice = 'D'
+                else:
+                    print(f"GT output '{gt_output}' does not match any choices for question: {question}")
+                    continue
+
+                mc_text = f"{question} Please choice from one of the answers below.\nA. {choices[0]}\nB. {choices[1]}\nC. {choices[2]}\nD. {choices[3]}"
+                mc_message = deepcopy(mc_message_template)
+                mc_message[1]['content'][0]['text'] = mc_text
+                mc_message[1]['content'][1]['image'] = image_path
+                multi_choice_conversations.append(mc_message)
+                mc_GT_outputs.append(gt_choice)
+
+    return multi_choice_conversations, mc_GT_outputs
+
+def parse_pmc_vqa_to_multi_choice_conversations(csv_path):
     df = pd.read_csv(csv_path)
     open_ended_conversations = []
     multi_choice_conversations = []
@@ -358,10 +408,13 @@ if __name__ == "__main__":
     
     if args.dataset == "PMC-VQA":
         data_path = "/home/yd344/palmer_scratch/PMC-VQA/test_2.csv"
-        _, _, conversations, gts = parser_pmc_vqa_to_multi_choice_conversations(data_path)
+        _, _, conversations, gts = parse_pmc_vqa_to_multi_choice_conversations(data_path)
     elif args.dataset == "MeCoVQA":
         data_path = 'data/MeCoVQA/test/MeCoVQA_Complex_VQA_test.json'
         conversations, gts = parse_json_to_conversations(data_path)
+    elif args.dataset == "OmniMedVQA":
+        data_path = '~/palmer_scratch/OmniMedVQA/OmniMedVQA/QA_information/Open-access/'
+        conversations, gts = parse_omnimedvqa_jsons(data_path)
     
     # Number of samples to evaluate
     num_samples = args.num_samples if args.num_samples > 0 else len(conversations)
