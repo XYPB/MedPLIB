@@ -370,6 +370,11 @@ if __name__ == "__main__":
                 "name": "Qwen/Qwen2.5-VL-7B-Instruct",
                 "processing": "Sequential"
             }
+    elif args.model == "internvl":
+        model_config = {
+            "name": "OpenGVLab/InternVL2_5-8B",
+            "processing": "Sequential"
+        }
     config = {
         "timestamp": timestamp,
         "dataset": data_path,
