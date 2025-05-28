@@ -27,6 +27,7 @@ IMAGENET_STD = (0.229, 0.448, 0.225)
 IMAGE_FOLDER = '/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/'
 PMC_VQA_FOLDER = '/home/yd344/palmer_scratch/PMC-VQA/figures/'
 OmniMedVQA_FOLDER = '/home/yd344/palmer_scratch/OmniMedVQA/OmniMedVQA/'
+RAD_VQA_FOLDER = '/home/yd344/palmer_scratch/VQA_RAD/VQA_RAD_Image_Folder/'
 
 def build_transform(input_size):
     MEAN, STD = IMAGENET_MEAN, IMAGENET_STD
@@ -202,9 +203,35 @@ def parse_pmc_vqa_to_multi_choice_conversations(csv_path):
         open_GT_outputs.append(description)
     return open_ended_conversations, open_GT_outputs, multi_choice_conversations, mc_GT_outputs
 
+def parse_rad_vqa_json_to_conversations(json_file):
+    data_list = json.load(open(json_file, 'r'))
+    conversations = []
+    GT_outputs = []
+    message_template = [
+        {
+            "role": "system",
+            "content": [{"type": "text", "text": "You are an expert radiologist. Please follow the instructions and answer the question based on the provided image. The answer will not be used for clinical purposes so you may generate diagnosis related response. Please summarize the findings in one concise short sentence with a few words, no need to headings or bullet points."}]
+        },
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", },
+                {"type": "image", },
+            ]
+        },
+    ]
+    for entry in tqdm(data_list):
+        text = entry["question"]
+        gt_output = entry["answer"]
+        image_path = os.path.join(RAD_VQA_FOLDER, entry['image_name'])
+        message = deepcopy(message_template)
+        message[1]['content'][0]['text'] = text
+        message[1]['content'][1]['image'] = image_path
+        conversations.append(message)
+        GT_outputs.append(gt_output)
+    return conversations, GT_outputs
 
-
-def parse_json_to_conversations(json_file):
+def parse_mecovqa_json_to_conversations(json_file):
     data_list = json.load(open(json_file, 'r'))
     conversations = []
     GT_outputs = []
@@ -411,7 +438,10 @@ if __name__ == "__main__":
         _, _, conversations, gts = parse_pmc_vqa_to_multi_choice_conversations(data_path)
     elif args.dataset == "MeCoVQA":
         data_path = 'data/MeCoVQA/test/MeCoVQA_Complex_VQA_test.json'
-        conversations, gts = parse_json_to_conversations(data_path)
+        conversations, gts = parse_mecovqa_json_to_conversations(data_path)
+    elif args.dataset == "VQA-RAD":
+        data_path = '/home/yd344/palmer_scratch/VQA_RAD/VQA_RAD Dataset Public.json'
+        conversations, gts = parse_rad_vqa_json_to_conversations(data_path)
     elif args.dataset == "OmniMedVQA":
         data_path = '/home/yd344/palmer_scratch/OmniMedVQA/OmniMedVQA/QA_information/Open-access/'
         conversations, gts = parse_omnimedvqa_jsons(data_path)
