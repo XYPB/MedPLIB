@@ -3,21 +3,157 @@ import json
 import os
 import datetime
 from PIL import Image
+import torchvision.transforms as T
 from tqdm import tqdm
 from transformers import pipeline
 from copy import deepcopy
+from torchvision.transforms.functional import InterpolationMode
+import pandas as pd
 
-from transformers import AutoProcessor, AutoModelForImageTextToText, AutoModel
+from transformers import AutoProcessor, AutoModelForImageTextToText, AutoModel, AutoTokenizer
 import argparse
 
 parser = argparse.ArgumentParser(description="Evaluate VLLM models on MeCoVQA dataset")
 parser.add_argument("--model", type=str, choices=["medgemma", "qwen"], required=True, help="Model to evaluate: 'medgemma' or 'qwen'")
+parser.add_argument("--dataset", type=str, default="MeCoVQA", help="Dataset to evaluate on (default: MeCoVQA)")
 parser.add_argument("--num_samples", type=int, default=10, help="Number of samples to evaluate (default: 10)")
 
 torch.set_float32_matmul_precision('high')
 torch.backends.cuda.enable_flash_sdp(True)
+IMAGENET_MEAN = (0.485, 0.456, 0.406)
+IMAGENET_STD = (0.229, 0.224, 0.225)
 
 IMAGE_FOLDER = '/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/'
+PMC_VQA_FOLDER = '/home/yd344/palmer_scratch/PMC-VQA/figures/'
+
+def build_transform(input_size):
+    MEAN, STD = IMAGENET_MEAN, IMAGENET_STD
+    transform = T.Compose([
+        T.Lambda(lambda img: img.convert('RGB') if img.mode != 'RGB' else img),
+        T.Resize((input_size, input_size), interpolation=InterpolationMode.BICUBIC),
+        T.ToTensor(),
+        T.Normalize(mean=MEAN, std=STD)
+    ])
+    return transform
+
+def find_closest_aspect_ratio(aspect_ratio, target_ratios, width, height, image_size):
+    best_ratio_diff = float('inf')
+    best_ratio = (1, 1)
+    area = width * height
+    for ratio in target_ratios:
+        target_aspect_ratio = ratio[0] / ratio[1]
+        ratio_diff = abs(aspect_ratio - target_aspect_ratio)
+        if ratio_diff < best_ratio_diff:
+            best_ratio_diff = ratio_diff
+            best_ratio = ratio
+        elif ratio_diff == best_ratio_diff:
+            if area > 0.5 * image_size * image_size * ratio[0] * ratio[1]:
+                best_ratio = ratio
+    return best_ratio
+
+def dynamic_preprocess(image, min_num=1, max_num=12, image_size=448, use_thumbnail=False):
+    orig_width, orig_height = image.size
+    aspect_ratio = orig_width / orig_height
+
+    # calculate the existing image aspect ratio
+    target_ratios = set(
+        (i, j) for n in range(min_num, max_num + 1) for i in range(1, n + 1) for j in range(1, n + 1) if
+        i * j <= max_num and i * j >= min_num)
+    target_ratios = sorted(target_ratios, key=lambda x: x[0] * x[1])
+
+    # find the closest aspect ratio to the target
+    target_aspect_ratio = find_closest_aspect_ratio(
+        aspect_ratio, target_ratios, orig_width, orig_height, image_size)
+
+    # calculate the target width and height
+    target_width = image_size * target_aspect_ratio[0]
+    target_height = image_size * target_aspect_ratio[1]
+    blocks = target_aspect_ratio[0] * target_aspect_ratio[1]
+
+    # resize the image
+    resized_img = image.resize((target_width, target_height))
+    processed_images = []
+    for i in range(blocks):
+        box = (
+            (i % (target_width // image_size)) * image_size,
+            (i // (target_width // image_size)) * image_size,
+            ((i % (target_width // image_size)) + 1) * image_size,
+            ((i // (target_width // image_size)) + 1) * image_size
+        )
+        # split the image
+        split_img = resized_img.crop(box)
+        processed_images.append(split_img)
+    assert len(processed_images) == blocks
+    if use_thumbnail and len(processed_images) != 1:
+        thumbnail_img = image.resize((image_size, image_size))
+        processed_images.append(thumbnail_img)
+    return processed_images
+
+def load_image(image_file, input_size=448, max_num=12):
+    image = Image.open(image_file).convert('RGB')
+    transform = build_transform(input_size=input_size)
+    images = dynamic_preprocess(image, image_size=input_size, use_thumbnail=True, max_num=max_num)
+    pixel_values = [transform(image) for image in images]
+    pixel_values = torch.stack(pixel_values)
+    return pixel_values
+
+def parser_pmc_vqa_to_multi_choice_conversations(csv_path):
+    df = pd.read_csv(csv_path)
+    open_ended_conversations = []
+    multi_choice_conversations = []
+    open_GT_outputs = []
+    mc_GT_outputs = []
+    mc_message_template = [
+        {
+            "role": "system",
+            "content": [{"type": "text", "text": "You are an expert radiologist. Please follow the instructions and answer the question based on the provided image. The answer will not be used for clinical purposes so you may generate diagnosis related response. Please answer the multi-choice question with one single letter option (A, B, C, or D), no need to headings or bullet points."}]
+        },
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", },
+                {"type": "image", },
+            ]
+        },
+    ]
+    open_message_template = [
+        {
+            "role": "system",
+            "content": [{"type": "text", "text": "You are an expert radiologist. Please follow the instructions and answer the question based on the provided image. The answer will not be used for clinical purposes so you may generate diagnosis related response. Please summarize the findings in one concise short paragraph, no need to headings or bullet points."}]
+        },
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", },
+                {"type": "image", },
+            ]
+        },
+    ]
+    for _, row in tqdm(df.iterrows(), total=len(df), desc="Processing PMC-VQA data"):
+        description = row['Caption']
+        question = row['Question']
+        choices = [row['Choice A'], row['Choice B'], row['Choice C'], row['Choice D']]
+
+        mc_text = f"{question} Please choice from one of the answers below.\n{choices[0]}\n{choices[1]}\n{choices[2]}\n{choices[3]}"
+
+        gt_output = row['Answer']
+        image_path = os.path.join(PMC_VQA_FOLDER, row['Figure_path'])
+
+        mc_message = deepcopy(mc_message_template)
+        mc_message[1]['content'][0]['text'] = mc_text
+        mc_message[1]['content'][1]['image'] = image_path
+        multi_choice_conversations.append(mc_message)
+        mc_GT_outputs.append(gt_output)
+
+        open_text = "Please summarize the most significant findings in one concise short sentence."
+        open_message = deepcopy(open_message_template)
+        open_message[1]['content'][0]['text'] = open_text
+        open_message[1]['content'][1]['image'] = image_path
+        open_ended_conversations.append(open_message)
+        open_GT_outputs.append(description)
+    return open_ended_conversations, open_GT_outputs, multi_choice_conversations, mc_GT_outputs
+
+
 
 def parse_json_to_conversations(json_file):
     data_list = json.load(open(json_file, 'r'))
@@ -170,6 +306,43 @@ def eval_qwen_vl(conversations, gts):
     
     return outputs
 
+def eval_intern_vl(conversations, gts):
+    # Note: batch_size parameter is kept for compatibility but not used
+    path = "OpenGVLab/InternVL2_5-8B"
+    model = AutoModel.from_pretrained(
+        path,
+        torch_dtype=torch.bfloat16,
+        low_cpu_mem_usage=True,
+        use_flash_attn=False,
+        trust_remote_code=True).eval().cuda()
+    tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast=False)
+
+    generation_config = dict(max_new_tokens=1024, do_sample=True)
+
+    outputs = []
+
+    # Process conversations one by one
+    for idx, messages in tqdm(enumerate(conversations), desc="Processing with Intern-VL", total=len(conversations)):
+        # Prepare the input
+        image_path = messages[1]['content'][1]['image']
+        image = load_image('./examples/image1.jpg', max_num=12).to(torch.bfloat16).cuda()
+        messages[1]['content'][1]['image'] = image
+        question = "<image>\n" + messages[1]['content'][0]['text']
+
+        # Generate the response
+        with torch.inference_mode():
+            decoded = model.chat(tokenizer, image, question, generation_config)
+            decoded = decoded.strip()  # Clean up whitespace
+            output = {
+                "id": image_path,
+                "input": messages[1]["content"][0]['text'],
+                "output": decoded,
+                "gt": gts[idx] if idx < len(gts) else None
+            }
+            outputs.append(output)
+
+    return outputs
+
 if __name__ == "__main__":
     args = parser.parse_args()
     # Create a timestamped directory for this run
@@ -177,8 +350,12 @@ if __name__ == "__main__":
     output_dir = os.path.join("./runs/output", f"eval_{timestamp}")
     os.makedirs(output_dir, exist_ok=True)
     
-    json_to_eval = 'data/MeCoVQA/test/MeCoVQA_Complex_VQA_test.json'
-    conversations, gts = parse_json_to_conversations(json_to_eval)
+    if args.dataset == "PMC-VQA":
+        csv_path = "/home/yd344/palmer_scratch/PMC-VQA/test_2.csv"
+        _, _, conversations, gts = parser_pmc_vqa_to_multi_choice_conversations(csv_path)
+    elif args.dataset == "MeCoVQA":
+        json_to_eval = 'data/MeCoVQA/test/MeCoVQA_Complex_VQA_test.json'
+        conversations, gts = parse_json_to_conversations(json_to_eval)
     
     # Number of samples to evaluate
     num_samples = args.num_samples if args.num_samples > 0 else len(conversations)
