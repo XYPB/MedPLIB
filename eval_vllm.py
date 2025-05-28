@@ -101,6 +101,7 @@ def load_image(image_file, input_size=448, max_num=12):
 
 def parse_omnimedvqa_jsons(json_dir):
     print(json_dir)
+    print(os.path.join(json_dir, '*.json'))
     json_list = glob(os.path.join(json_dir, '*.json'))
     print(json_list)
     multi_choice_conversations = []
