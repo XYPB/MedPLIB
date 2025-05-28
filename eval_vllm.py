@@ -458,9 +458,7 @@ def eval_llava_med(conversations, gts):
                 truncation=True,
             ).to(model.device)
 
-            print(inputs)
-
-            output_ids  = model.generate(inputs.input_ids, inputs.attention_mask, images=image_tensor, max_new_tokens=1024, do_sample=False)
+            output_ids  = model.generate(inputs.input_ids, attention_mask=inputs.attention_mask, images=image_tensor, max_new_tokens=1024, do_sample=False)
             print(output_ids)
             decoded = tokenizer.decode(output_ids[0], skip_special_tokens=True)
             decoded = decoded.strip()
