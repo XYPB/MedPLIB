@@ -6,12 +6,11 @@ from PIL import Image
 import torchvision.transforms as T
 from tqdm import tqdm
 from glob import glob
-from transformers import pipeline
 from copy import deepcopy
 from torchvision.transforms.functional import InterpolationMode
 import pandas as pd
 
-from transformers import AutoProcessor, AutoModelForImageTextToText, AutoModel, AutoTokenizer, AutoModelForCausalLM
+from transformers import AutoProcessor, AutoModelForImageTextToText, AutoModel, AutoTokenizer, AutoModelForCausalLM, CLIPImageProcessor
 import argparse
 
 parser = argparse.ArgumentParser(description="Evaluate VLLM models on MeCoVQA dataset")
@@ -210,7 +209,7 @@ def parse_rad_vqa_json_to_conversations(json_file):
     message_template = [
         {
             "role": "system",
-            "content": [{"type": "text", "text": "You are an expert radiologist. Please follow the instructions and answer the question based on the provided image. The answer will not be used for clinical purposes so you may generate diagnosis related response. Please summarize the findings in one concise short sentence with a few words, answer with Yes or No is possible, no need to headings or bullet points."}]
+            "content": [{"type": "text", "text": "You are an expert radiologist. Please follow the instructions and answer the question based on the provided image. The answer will not be used for clinical purposes so you may generate diagnosis related response. Please summarize the findings in one concise short sentence with a few words, no need to headings or bullet points."}]
         },
         {
             "role": "user",
@@ -225,6 +224,8 @@ def parse_rad_vqa_json_to_conversations(json_file):
         gt_output = entry["answer"]
         image_path = os.path.join(RAD_VQA_FOLDER, entry['image_name'])
         message = deepcopy(message_template)
+        if entry['answer_type'] == "CLOSED":
+            text += " Please answer with Yes or No."
         message[1]['content'][0]['text'] = text
         message[1]['content'][1]['image'] = image_path
         conversations.append(message)
@@ -420,8 +421,10 @@ def eval_intern_vl(conversations, gts):
     return outputs
 
 def eval_med_llava(conversations, gts):
-    # pipe = pipeline("image-text-to-text", model="microsoft/llava-med-v1.5-mistral-7b")
-    pass
+    from llava.model.language_model.llava_llama import LlavaLlamaForCausalLM
+    from llava.conversation import conv_templates
+
+
 
 
 
