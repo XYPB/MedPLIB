@@ -417,7 +417,7 @@ if __name__ == "__main__":
         data_path = 'data/MeCoVQA/test/MeCoVQA_Complex_VQA_test.json'
         conversations, gts = parse_json_to_conversations(data_path)
     elif args.dataset == "OmniMedVQA":
-        data_path = '~/palmer_scratch/OmniMedVQA/OmniMedVQA/QA_information/Open-access/'
+        data_path = '/home/yd344/palmer_scratch/OmniMedVQA/OmniMedVQA/QA_information/Open-access/'
         conversations, gts = parse_omnimedvqa_jsons(data_path)
     
     # Number of samples to evaluate
