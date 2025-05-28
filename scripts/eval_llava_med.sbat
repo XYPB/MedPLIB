@@ -17,7 +17,7 @@
 
 cd ~/project/MedPLIB
 module load miniconda
-conda activate vllm
+conda activate llava-med
 git pull
 
 python eval_vllm.py --model llava_med --num_samples -1
