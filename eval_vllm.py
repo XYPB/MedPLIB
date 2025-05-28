@@ -100,10 +100,7 @@ def load_image(image_file, input_size=448, max_num=12):
     return pixel_values
 
 def parse_omnimedvqa_jsons(json_dir):
-    print(json_dir)
-    print(os.path.join(json_dir, '*.json'))
     json_list = glob(os.path.join(json_dir, '*.json'))
-    print(json_list)
     multi_choice_conversations = []
     mc_GT_outputs = []
     mc_message_template = [
