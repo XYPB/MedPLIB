@@ -423,20 +423,7 @@ def create_optimized_intern_vl_function():
             image_path = messages[1]['content'][1]['image']
             
             # Optimize image loading - reduce resolution and patches
-            image = Image.open(image_path).convert('RGB')
-            
-            # Downsample large images first
-            w, h = image.size
-            if max(w, h) > 512:
-                scale = 512 / max(w, h)
-                new_w, new_h = int(w * scale), int(h * scale)
-                image = image.resize((new_w, new_h), Image.LANCZOS)
-            
-            # Use smaller input size and fewer patches
-            transform = build_transform(input_size=384)  # Reduced from 448
-            images = dynamic_preprocess(image, image_size=384, use_thumbnail=False, max_num=8)  # Reduced from 12
-            pixel_values = [transform(img) for img in images]
-            image_tensor = torch.stack(pixel_values).to(torch.bfloat16).cuda()
+            image_tensor = load_image(image_path, input_size=224, max_num=12)
             
             # Clear intermediate variables to save memory
             del image, images, pixel_values
