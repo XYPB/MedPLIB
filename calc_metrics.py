@@ -48,10 +48,11 @@ def evaluate(test_dict_lst, args):
             pred_value = normalize_word(pred_value)
 
         if args.dataset == 'VQA-RAD':
-            question = item['input'].lower()
-            if 'please answer with yes or no.' in question:
+            if gt_value in ['yes', 'no']:
+                eval_closed = True
                 args.dataset = 'VQA-RAD-yesno'
             else:
+                eval_open = True
                 args.dataset = 'VQA-RAD-open'
 
         if args.dataset in ['MeCoVQA', 'VQA-RAD-open']:
