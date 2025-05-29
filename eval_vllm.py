@@ -21,7 +21,7 @@ parser.add_argument("--num_samples", type=int, default=10, help="Number of sampl
 torch.set_float32_matmul_precision('high')
 torch.backends.cuda.enable_flash_sdp(True)
 IMAGENET_MEAN = (0.485, 0.456, 0.406)
-IMAGENET_STD = (0.229, 0.448, 0.225)
+IMAGENET_STD = (0.229, 0.224, 0.225)
 
 IMAGE_FOLDER = '/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/'
 PMC_VQA_FOLDER = '/home/yd344/palmer_scratch/PMC-VQA/figures/'
@@ -383,45 +383,116 @@ def eval_qwen_vl(conversations, gts):
     
     return outputs
 
-def eval_intern_vl(conversations, gts):
-    # Note: batch_size parameter is kept for compatibility but not used
-    path = "OpenGVLab/InternVL3-8B"
-    model = AutoModel.from_pretrained(
-        path,
-        torch_dtype=torch.bfloat16,
-        low_cpu_mem_usage=True,
-        use_flash_attn=False,
-        trust_remote_code=True).eval().cuda()
-    tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast=False)
+def create_optimized_intern_vl_function():
+    """
+    Creates a new memory-optimized version of the InternVL evaluation function
+    """
+    def eval_intern_vl_optimized(conversations, gts):
+        """
+        Memory-optimized version of the InternVL evaluation function
+        """
+        import gc
+        path = "OpenGVLab/InternVL3-8B"
+        
+        print("Starting InternVL with memory optimizations...")
+        # Pre-inference memory cleanup
+        torch.cuda.empty_cache()
+        gc.collect()
+        
+        # Model initialization with memory optimization settings
+        model = AutoModel.from_pretrained(
+            path,
+            torch_dtype=torch.bfloat16,
+            low_cpu_mem_usage=True,
+            use_flash_attn=False,
+            device_map="auto",       # Use device map for better memory management
+            offload_folder="offload_folder",  # Enable CPU offloading if needed
+            trust_remote_code=True
+        ).eval()
+        
+        tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast=False)
 
-    generation_config = dict(max_new_tokens=1024, do_sample=False)
+        # Reduce max tokens to save memory
+        generation_config = dict(max_new_tokens=512, do_sample=False)
 
-    outputs = []
+        outputs = []
+        
+        # Process conversations one by one with memory optimizations
+        for idx, messages in tqdm(enumerate(conversations), desc="Processing with Intern-VL", total=len(conversations)):
+            try:
+                # Prepare the input
+                image_path = messages[1]['content'][1]['image']
+                
+                # Optimize image loading - reduce resolution and patches
+                image = Image.open(image_path).convert('RGB')
+                
+                # Downsample large images first
+                w, h = image.size
+                if max(w, h) > 512:
+                    scale = 512 / max(w, h)
+                    new_w, new_h = int(w * scale), int(h * scale)
+                    image = image.resize((new_w, new_h), Image.LANCZOS)
+                
+                # Use smaller input size and fewer patches
+                transform = build_transform(input_size=384)  # Reduced from 448
+                images = dynamic_preprocess(image, image_size=384, use_thumbnail=False, max_num=8)  # Reduced from 12
+                pixel_values = [transform(img) for img in images]
+                image_tensor = torch.stack(pixel_values).to(torch.bfloat16).cuda()
+                
+                # Clear intermediate variables to save memory
+                del image, images, pixel_values
+                torch.cuda.empty_cache()
+                
+                system_prompt = messages[0]["content"][0]["text"]
+                question = "<image>\n" + messages[1]['content'][0]['text']
+                message = f"INSTRUCTION: {system_prompt}\n\nQUESTION: {question}\n\nANSWER:"
 
-    # Process conversations one by one
-    for idx, messages in tqdm(enumerate(conversations), desc="Processing with Intern-VL", total=len(conversations)):
-        # Prepare the input
-        image_path = messages[1]['content'][1]['image']
-        image = load_image(image_path, max_num=12).to(torch.bfloat16).cuda()
-        messages[1]['content'][1]['image'] = image
-        system_prompt = messages[0]["content"][0]["text"]
-        question = "<image>\n" + messages[1]['content'][0]['text']
+                # Generate the response
+                with torch.inference_mode():
+                    decoded = model.chat(tokenizer, image_tensor, message, generation_config)
+                    decoded = decoded.strip()
+                    
+                    # Prepare output
+                    output = {
+                        "id": image_path,
+                        "input": messages[1]["content"][0]['text'],
+                        "output": decoded,
+                        "gt": gts[idx] if idx < len(gts) else None
+                    }
+                    outputs.append(output)
+                
+                # Clear memory after processing each sample
+                del image_tensor
+                torch.cuda.empty_cache()
+                gc.collect()
+                
+            except Exception as e:
+                print(f"Error processing image {image_path}: {e}")
+                output = {
+                    "id": image_path,
+                    "input": messages[1]["content"][0]['text'] if "content" in messages[1] else "Error retrieving input",
+                    "output": f"Error during generation: {str(e)}",
+                    "gt": gts[idx] if idx < len(gts) else None
+                }
+                outputs.append(output)
+                raise e  # Re-raise the exception to stop processing further
+                
+                # Try to recover from error
+                # torch.cuda.empty_cache()
+                # gc.collect()
+                
+            # Extra memory cleanup between samples
+            if idx % 100 == 0:  # More aggressive cleanup every 100 samples
+                print(f"Performing deep memory cleanup at sample {idx}")
+                torch.cuda.empty_cache()
+                gc.collect()
 
-        message = f"INSTRUCTION: {system_prompt}\n\nQUESTION: {question}\n\nANSWER:"
+        return outputs
+    
+    return eval_intern_vl_optimized
 
-        # Generate the response
-        with torch.inference_mode():
-            decoded = model.chat(tokenizer, image, message, generation_config)
-            decoded = decoded.strip()  # Clean up whitespace
-            output = {
-                "id": image_path,
-                "input": messages[1]["content"][0]['text'],
-                "output": decoded,
-                "gt": gts[idx] if idx < len(gts) else None
-            }
-            outputs.append(output)
-
-    return outputs
+# Replace the original function with the optimized version
+eval_intern_vl = create_optimized_intern_vl_function()
 
 def eval_llava_med(conversations, gts):
     from llava.model.builder import load_pretrained_model
@@ -439,7 +510,7 @@ def eval_llava_med(conversations, gts):
     for idx, messages in tqdm(enumerate(conversations), desc="Processing with LLaVA-Med", total=len(conversations)):
         # Prepare the input
         image_path = messages[1]['content'][1]['image']
-        image = Image.open(image_path).convert('RGB')
+        image = Image.open(image_path).resize((224, 224)).convert('RGB')
         image_tensor = image_processor(images=image, return_tensors="pt").pixel_values.to(model.device, dtype=model.dtype)
         messages[1]['content'][1]['image'] = image
         question = "<image>\n" + messages[1]['content'][0]['text'] + '\n Please just answer A, B, C, or D, no need for explanations.'
