@@ -65,8 +65,6 @@ def evaluate(test_dict_lst, args, dataset):
 
         if 'PVQA' in dataset:
             gt_value = gt_value.replace("'", "")
-            print(gt_value in ['yes', 'no'])
-            print(gt_value, gt_value == 'yes', gt_value == 'no')
             if gt_value in ['yes', 'no']:
                 eval_closed = True
                 dataset = 'PVQA-yesno'
@@ -76,7 +74,6 @@ def evaluate(test_dict_lst, args, dataset):
             else:
                 eval_open = True
                 dataset = 'PVQA-open'
-        print(gt_value, dataset)
 
         if dataset in ['MeCoVQA', 'VQA-RAD-open', 'PVQA-open']:
             eval_open = True
@@ -148,7 +145,6 @@ def evaluate(test_dict_lst, args, dataset):
                 # extract answer value for multiple choice questions
                 gt_option = extract_answer_option(item['input'], gt_value)
 
-            print('pred_value', pred_value, 'gt_value', gt_value)
             # print('##gt_option', gt_option, '##pred_value', pred_value)
             if gt_value == pred_value_filtered or gt_option in pred_value:
                 closed_scores['hit'].append(1)
