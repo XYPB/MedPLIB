@@ -442,7 +442,7 @@ def eval_llava_med(conversations, gts):
         image = Image.open(image_path).convert('RGB')
         image_tensor = image_processor(images=image, return_tensors="pt").pixel_values.to(model.device, dtype=model.dtype)
         messages[1]['content'][1]['image'] = image
-        question = "<image>\n" + messages[1]['content'][0]['text']
+        question = "<image>\n" + messages[1]['content'][0]['text'] + '\n Please just answer A, B, C, or D, no need for explanations.'
         system_prompt = messages[0]["content"][0]["text"]
 
         conv = conv_templates['mistral_instruct'].copy()
