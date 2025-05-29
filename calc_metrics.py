@@ -41,11 +41,13 @@ def evaluate(test_dict_lst, args):
 
 
         gt_value = normalize_word(gt_value)
+        print(pred_value)
         if pred_value.lower() == 'a':
             # avoid 'a' as a prediction
             pred_value = 'a'
         else:
             pred_value = normalize_word(pred_value)
+        print(pred_value)
 
         if args.dataset == 'VQA-RAD':
             question = item['input'].lower()
