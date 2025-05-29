@@ -499,14 +499,15 @@ def eval_intern_vl(conversations, gts, instruct_ft=False):
 
 def eval_llava_med(conversations, gts):
     from llava.model.builder import load_pretrained_model
+    from llava.constants import IMAGE_TOKEN_INDEX
     from llava.conversation import conv_templates
+    from llava.mm_utils import tokenizer_image_token
 
     tokenizer, model, image_processor, context_len = load_pretrained_model(
         model_path='/home/yd344/palmer_scratch/huggingface_models/llava-med-v1.5-mistral-7b',
         model_base=None,
         model_name='llava-med-v1.5-mistral-7b'
     )
-    print(model.config.mm_use_im_start_end)
 
     model = model.eval().cuda()
     outputs = []
@@ -531,14 +532,9 @@ def eval_llava_med(conversations, gts):
 
         # Generate the response
         with torch.inference_mode():
-            inputs = tokenizer(
-                prompt, 
-                return_tensors="pt", 
-                max_length=1024,
-                truncation=True,
-            ).to(model.device)
+            input_ids = tokenizer_image_token(prompt, tokenizer, IMAGE_TOKEN_INDEX, return_tensors='pt').unsqueeze(0).to(model.device)
 
-            output_ids  = model.generate(inputs.input_ids, attention_mask=inputs.attention_mask, images=image_tensor, max_new_tokens=1024, do_sample=False)
+            output_ids = model.generate(input_ids, images=image_tensor, max_new_tokens=1024, do_sample=False, use_cache=True)
             decoded = tokenizer.decode(output_ids[0], skip_special_tokens=True)
             decoded = decoded.strip()
 
