@@ -189,7 +189,7 @@ if __name__ == "__main__":
     test_dict_lst = json.load(open(args.pred, 'r'))['outputs']
 
     print('test_dict_lst', len(test_dict_lst))
-    dataset = args.pred.split('/')[-1].split('_')[3]
+    dataset = args.pred.split('/')[-2].split('_')[3]
 
     if len(test_dict_lst) == 0:
         print('No predictions found in the file.')
