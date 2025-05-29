@@ -35,7 +35,7 @@ def evaluate(test_dict_lst, args, dataset):
     open_cnt = 0
     closed_cnt = 0
     for item in tqdm(test_dict_lst):
-        gt_value = item['gt'].lower()
+        gt_value = str(item['gt']).lower()
         pred_value = item['output'].lower()
 
 
