@@ -29,6 +29,7 @@ IMAGE_FOLDER = '/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1/
 PMC_VQA_FOLDER = '/home/yd344/palmer_scratch/PMC-VQA/figures/'
 OmniMedVQA_FOLDER = '/home/yd344/palmer_scratch/OmniMedVQA/OmniMedVQA/'
 RAD_VQA_FOLDER = '/home/yd344/palmer_scratch/VQA_RAD/VQA_RAD_Image_Folder/'
+PVQA_FOLDER = '/home/yd344/palmer_scratch/pvqa/images/test'
 
 def build_transform(input_size):
     MEAN, STD = IMAGENET_MEAN, IMAGENET_STD
@@ -147,6 +148,42 @@ def parse_omnimedvqa_jsons(json_dir):
     print(f"Total multi-choice conversations: {len(multi_choice_conversations)}")
 
     return multi_choice_conversations, mc_GT_outputs
+
+def parse_pvqa_to_conversations(pickle_path):
+    import pickle
+    data_list = pickle.load(open(pickle_path, 'rb'))
+    conversations = []
+    GT_outputs = []
+    message_template = [
+        {
+            "role": "system",
+            "content": [{"type": "text", "text": "You are an expert pathologist. Please follow the instructions and answer the question based on the provided image. The answer will not be used for clinical purposes so you may generate diagnosis related response. Please summarize the findings in one concise and short sentence with a few words, no need to headings or bullet points."}]
+        },
+        {
+            "role": "user",
+            "content": [
+                {"type": "text", },
+                {"type": "image", },
+            ]
+        },
+    ]
+
+    for entry in tqdm(data_list, desc="Processing PVQA data"):
+        question = entry['sent']
+        answer_type = entry['answer_type']
+        image_path = os.path.join(PVQA_FOLDER, entry['img_id'] + '.jpg')
+        gt_output = list(entry['label'].keys())
+
+        message = deepcopy(message_template)
+        if answer_type == 'yes/no':
+            question += " Please answer with Yes or No."
+        elif answer_type == 'number':
+            question += " Please answer with a single number."
+        message[1]['content'][0]['text'] = question
+        message[1]['content'][1]['image'] = image_path
+        conversations.append(message)
+        GT_outputs.append(gt_output)
+    return conversations, GT_outputs
 
 def parse_pmc_vqa_to_multi_choice_conversations(csv_path):
     df = pd.read_csv(csv_path)
@@ -538,6 +575,9 @@ if __name__ == "__main__":
     elif args.dataset == "OmniMedVQA":
         data_path = '/home/yd344/palmer_scratch/OmniMedVQA/OmniMedVQA/QA_information/Open-access/'
         conversations, gts = parse_omnimedvqa_jsons(data_path)
+    elif args.dataset == "PVQA":
+        data_path = '/home/yd344/palmer_scratch/pvqa/qas/test_vqa.pkl'
+        conversations, gts = parse_pvqa_to_conversations(data_path)
     else:
         raise ValueError(f"Unsupported dataset: {args.dataset}. Supported datasets are: PMC-VQA, MeCoVQA, VQA-RAD, OmniMedVQA.")
     
