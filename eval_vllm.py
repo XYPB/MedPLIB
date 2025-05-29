@@ -452,7 +452,7 @@ def create_optimized_intern_vl_function():
                 gc.collect()
 
             # Extra memory cleanup between samples
-            if idx % 2 == 0:  # More aggressive cleanup every 2 samples
+            if idx % 100 == 0:  # More aggressive cleanup every 100 samples
                 print(f"Performing deep memory cleanup at sample {idx}")
                 torch.cuda.empty_cache()
                 gc.collect()
