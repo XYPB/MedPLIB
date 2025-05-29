@@ -103,6 +103,7 @@ def calculate_appearance_with_normalization(prediction, reference, candidate_set
     final_prediction = candidate_answer_normalized_list[argmax(similarity_list)]
 
     print('##final_prediction ', final_prediction)
+    assert final_prediction in candidate_set, f"Final prediction {final_prediction} not in candidate set"
 
     # import pdb; pdb.set_trace()
 
