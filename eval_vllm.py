@@ -450,6 +450,7 @@ def eval_llava_med(conversations, gts):
         conv.append_message(conv.roles[0], question)
         conv.append_message(conv.roles[1], None)  # Placeholder for the model's response
         prompt = conv.get_prompt()
+        print(prompt)
 
         # Generate the response
         with torch.inference_mode():
@@ -569,7 +570,7 @@ if __name__ == "__main__":
         print(f"Evaluating Intern-VL on {num_samples} samples...")
         intern_outputs = eval_intern_vl(deepcopy(conversations)[:num_samples], gts[:num_samples])
         intern_model_info = {
-            "model_name": "OpenGVLab/InternVL2_5-8B",
+            "model_name": "OpenGVLab/InternVL3-8B",
             "model_type": "Image-Text-to-Text",
             "batch_size": "N/A (Sequential processing)"
         }
