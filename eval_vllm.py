@@ -394,7 +394,7 @@ def eval_intern_vl(conversations, gts):
         trust_remote_code=True).eval().cuda()
     tokenizer = AutoTokenizer.from_pretrained(path, trust_remote_code=True, use_fast=False)
 
-    generation_config = dict(max_new_tokens=1024, do_sample=True)
+    generation_config = dict(max_new_tokens=1024, do_sample=False)
 
     outputs = []
 
