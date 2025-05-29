@@ -27,6 +27,11 @@ def filter_closed_answers(prediction, answer_type):
         prediction = [word for word in prediction if word in ['yes', 'no']]
         prediction = 'yes' if 'yes' in prediction else 'no' if 'no' in prediction else ''
         return prediction.strip() if prediction else ''  # Default to '' if no valid answer found
+    elif answer_type.lower() in ['number', 'numeric']:
+        # For numeric questions, we filter out non-numeric values
+        prediction = [word for word in prediction if word.isdigit()]
+        prediction = ' '.join(prediction).strip()
+        return prediction if prediction else ''
     elif answer_type.lower() in ['multiple_choice', 'mcq']:
         # For open-ended questions, we return the prediction as is
         # print(prediction)

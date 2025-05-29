@@ -63,7 +63,18 @@ def evaluate(test_dict_lst, args, dataset):
                 eval_open = True
                 dataset = 'VQA-RAD-open'
 
-        if dataset in ['MeCoVQA', 'VQA-RAD-open']:
+        if 'PVQA' in dataset:
+            if gt_value in ['yes', 'no']:
+                eval_closed = True
+                dataset = 'PVQA-yesno'
+            elif gt_value.isdigit():
+                eval_closed = True
+                dataset = 'PVQA-number'
+            else:
+                eval_open = True
+                dataset = 'PVQA-open'
+
+        if dataset in ['MeCoVQA', 'VQA-RAD-open', 'PVQA-open']:
             eval_open = True
             # for open-ended question
             # if gt_value in pred_value:
@@ -109,7 +120,7 @@ def evaluate(test_dict_lst, args, dataset):
             bleu_scores['bleu_score_3'].append(b_score_3)
             open_cnt += 1
 
-        elif dataset in ['PMC-VQA', 'OmniMedVQA', 'VQA-RAD-yesno']:
+        elif dataset in ['PMC-VQA', 'OmniMedVQA', 'VQA-RAD-yesno', 'PVQA-closed']:
             eval_closed = True
             # for close-ended question (Yes/No)
             closed_scores['q_id'].append(item['id'])
@@ -122,8 +133,11 @@ def evaluate(test_dict_lst, args, dataset):
             #     closed_scores['hit'].append(0)
 
 
-            if dataset == 'VQA-RAD-yesno':
+            if dataset == 'VQA-RAD-yesno' or dataset == 'PVQA-yesno':
                 pred_value_filtered = filter_closed_answers(pred_value, 'yes/no')
+                gt_option = gt_value.lower().strip()
+            elif dataset == 'PVQA-number':
+                pred_value_filtered = filter_closed_answers(pred_value, 'number')
                 gt_option = gt_value.lower().strip()
             else:
                 pred_value_filtered = filter_closed_answers(pred_value, 'multiple_choice')
