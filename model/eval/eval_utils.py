@@ -2,6 +2,18 @@ from collections import defaultdict
 import re
 import math
 
+def extract_answer_option(questions, gt_value):
+    questions = questions.lower().strip()
+
+    # extract the answer option from the question
+    # answer option is wrapped in gt_value: <value> \n
+    pattern = re.compile(rf'{re.escape(gt_value)}:\s*<(\w+)>\n')
+    match = re.search(pattern, questions)
+    print(match)
+    if match:
+        return match.group(1)
+    return gt_value
+
 def filter_closed_answers(prediction, answer_type):
     # print(f"Filtering prediction: {prediction} for answer type: {answer_type}")
     prediction = prediction.lower().strip()

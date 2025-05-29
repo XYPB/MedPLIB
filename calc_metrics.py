@@ -114,10 +114,15 @@ def evaluate(test_dict_lst, args):
             # else:
             #     closed_scores['hit'].append(0)
 
+
             if args.dataset == 'VQA-RAD-yesno':
                 pred_value_filtered = filter_closed_answers(pred_value, 'yes/no')
+                gt_option = gt_value.lower().strip()
             else:
                 pred_value_filtered = filter_closed_answers(pred_value, 'multiple_choice')
+                # extract answer value for multiple choice questions
+                gt_option = extract_answer_option(item['input'], gt_value)
+
             # print('pred_value', pred_value, 'gt_value', gt_value)
 
             if gt_value == pred_value_filtered:
