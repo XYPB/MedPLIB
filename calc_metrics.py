@@ -108,6 +108,7 @@ def evaluate(test_dict_lst, args):
                 pred_value = filter_closed_answers(pred_value, 'yes/no')
             else:
                 pred_value = filter_closed_answers(pred_value, 'multiple_choice')
+            print('pred_value', pred_value, 'gt_value', gt_value)
 
             if gt_value == pred_value:
                 closed_scores['hit'].append(1)
