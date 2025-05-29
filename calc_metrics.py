@@ -18,7 +18,7 @@ def evaluate(test_dict_lst, args, dataset):
 
     candidate_set = []
     for item in test_dict_lst:
-        candidate = item['output'].lower().strip()
+        candidate = item['gt'].lower().strip()
         if candidate not in ['yes', 'no', 'a', 'b', 'c', 'd', 'e']:
             # no consider closed answers
             candidate = normalize_word(candidate)
