@@ -530,16 +530,12 @@ def eval_llava_med(conversations, gts):
 
         # Generate the response
         with torch.inference_mode():
-            print(tokenizer("<image>"))
-            print(tokenizer.special_tokens_map)
             inputs = tokenizer(
                 prompt, 
                 return_tensors="pt", 
                 max_length=1024,
                 truncation=True,
             ).to(model.device)
-            print(inputs.input_ids, inputs.input_ids == -200)
-            print(tokenizer.decode(inputs.input_ids[0]))
 
             output_ids  = model.generate(inputs.input_ids, attention_mask=inputs.attention_mask, images=image_tensor, max_new_tokens=1024, do_sample=False)
             decoded = tokenizer.decode(output_ids[0], skip_special_tokens=True)
