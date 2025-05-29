@@ -68,6 +68,9 @@ def evaluate(test_dict_lst, args, dataset):
             #     hit = 0.0
             # open_hit_scores['hit'].append(hit)
 
+            print('##pred_value', pred_value, '##gt_value', gt_value, '##candidate_set', candidate_set)
+            print(calculate_appearance_with_normalization(pred_value, gt_value, candidate_set))
+
             open_hit_scores['hit'].append(calculate_appearance_with_normalization(pred_value, gt_value, candidate_set))
             open_hit_scores['q_id'].append(item['id'])
 
@@ -127,7 +130,7 @@ def evaluate(test_dict_lst, args, dataset):
             if gt_value == pred_value_filtered or gt_option in pred_value:
                 closed_scores['hit'].append(1)
             else:
-
+                print('##pred_value', pred_value, '##gt_value', gt_value)
                 closed_scores['hit'].append(0)
             closed_cnt += 1
     

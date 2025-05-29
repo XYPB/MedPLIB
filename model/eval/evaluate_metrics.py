@@ -98,6 +98,8 @@ def calculate_appearance_with_normalization(prediction, reference, candidate_set
 
     final_prediction = candidate_answer_normalized_list[argmax(similarity_list)]
 
+    print('##final_predictionss', final_prediction)
+
     # import pdb; pdb.set_trace()
 
     if final_prediction == reference:
