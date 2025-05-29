@@ -170,7 +170,7 @@ def evaluate(test_dict_lst, args):
 if __name__ == "__main__":
     args = parser.parse_args()
 
-    test_dict_lst = json.load(open(args.pred, 'r'))
+    test_dict_lst = json.load(open(args.pred, 'r'))['outputs']
 
     print('test_dict_lst', len(test_dict_lst))
 
