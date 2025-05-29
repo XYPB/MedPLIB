@@ -11,7 +11,7 @@ def extract_answer_option(questions, gt_value):
     match = re.search(pattern, questions)
     if match:
         matched_value = match.group(1)
-        matched_value = matched_value.replace(gt_value, '').replace(':', '').strip()  # Remove choice label and colon
+        matched_value = matched_value.replace(f'{gt_value}:', '').strip()  # Remove choice label and colon
         return matched_value
     return gt_value
 
