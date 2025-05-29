@@ -13,7 +13,7 @@ def filter_closed_answers(prediction, answer_type):
         return prediction.strip() if prediction else ''  # Default to '' if no valid answer found
     elif answer_type.lower() in ['multiple_choice', 'mcq']:
         # For open-ended questions, we return the prediction as is
-        prediction = [word for word in prediction if word in ['a', 'b', 'c', 'd', 'e']]  # Remove empty strings
+        prediction = [word for word in prediction if word in ['a', 'b', 'c', 'd', 'e']][0]  # Remove empty strings
         return prediction if prediction else ''  # Default to '' if no valid answer found
     else:
         # For other types of questions, we return the prediction as is
