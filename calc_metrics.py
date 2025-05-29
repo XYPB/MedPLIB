@@ -124,10 +124,12 @@ def evaluate(test_dict_lst, args):
                 gt_option = extract_answer_option(item['input'], gt_value)
 
             # print('pred_value', pred_value, 'gt_value', gt_value)
-
-            if gt_value == pred_value_filtered:
+            if gt_option in pred_value_filtered:
+                print('gt_option', gt_option, 'pred_value_filtered', pred_value_filtered)
+            if gt_value == pred_value_filtered or gt_option in pred_value_filtered:
                 closed_scores['hit'].append(1)
             else:
+
                 closed_scores['hit'].append(0)
             closed_cnt += 1
     

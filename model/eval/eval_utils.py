@@ -11,7 +11,9 @@ def extract_answer_option(questions, gt_value):
     match = re.search(pattern, questions)
     print(match)
     if match:
-        return match.group(1)
+        matched_value = match.group(1)
+        matched_value = matched_value.replace(gt_value, '').replace(':', '').strip()  # Remove choice label and colon
+        return matched_value
     return gt_value
 
 def filter_closed_answers(prediction, answer_type):
