@@ -20,7 +20,7 @@ module load miniconda
 conda activate vllm
 git pull
 
-python eval_vllm.py --model internvl --num_samples -1
+# python eval_vllm.py --model internvl --num_samples -1
 python eval_vllm.py --model internvl --num_samples -1 --dataset "PMC-VQA"
 python eval_vllm.py --model internvl --num_samples -1 --dataset "OmniMedVQA"
-python eval_vllm.py --model internvl --num_samples -1 --dataset "VQA-RAD"
+# python eval_vllm.py --model internvl --num_samples -1 --dataset "VQA-RAD"
