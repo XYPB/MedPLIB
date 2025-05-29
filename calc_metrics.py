@@ -64,7 +64,6 @@ def evaluate(test_dict_lst, args, dataset):
                 dataset = 'VQA-RAD-open'
 
         if 'PVQA' in dataset:
-            print(gt_value)
             if gt_value in ['yes', 'no']:
                 eval_closed = True
                 dataset = 'PVQA-yesno'
@@ -74,6 +73,7 @@ def evaluate(test_dict_lst, args, dataset):
             else:
                 eval_open = True
                 dataset = 'PVQA-open'
+        print(gt_value, dataset)
 
         if dataset in ['MeCoVQA', 'VQA-RAD-open', 'PVQA-open']:
             eval_open = True
