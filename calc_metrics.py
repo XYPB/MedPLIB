@@ -18,7 +18,10 @@ def evaluate(test_dict_lst, args, dataset):
 
     candidate_set = []
     for item in test_dict_lst:
-        candidate_set.append(item['gt'])
+        candidate = item['output'].lower().strip()
+        if candidate not in ['yes', 'no', 'a', 'b', 'c', 'd', 'e']:
+            # no consider closed answers
+            candidate_set.append(candidate)
     
     print(len(candidate_set))
     candidate_set = set(candidate_set)
