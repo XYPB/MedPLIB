@@ -9,7 +9,6 @@ def extract_answer_option(questions, gt_value):
     # answer option is wrapped in gt_value: <value> \n
     pattern = rf"{gt_value}:(.*?)(?:\n|$)"
     match = re.search(pattern, questions)
-    print(match)
     if match:
         matched_value = match.group(1)
         matched_value = matched_value.replace(gt_value, '').replace(':', '').strip()  # Remove choice label and colon
