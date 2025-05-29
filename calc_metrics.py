@@ -40,7 +40,12 @@ def evaluate(test_dict_lst, args):
         pred_value = item['output'].lower()
 
 
-        gt_value = normalize_word(gt_value)
+        if item['gt'] == 'A':
+            # avoid 'a' as a ground truth
+            gt_value = 'a'
+        else:
+            # normalize the ground truth value
+            gt_value = normalize_word(gt_value)
         if item['output'] == 'A' or item['output'].startswith('A,'):
             # avoid 'a' as a prediction
             pred_value = 'a'
