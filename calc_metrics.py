@@ -43,7 +43,6 @@ def evaluate(test_dict_lst, args):
         gt_value = normalize_word(gt_value)
         if item['output'] == 'A' or item['output'].startswith('A,'):
             # avoid 'a' as a prediction
-            print(pred_value)
             pred_value = 'a'
         else:
             pred_value = normalize_word(pred_value)
