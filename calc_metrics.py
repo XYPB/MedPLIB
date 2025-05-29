@@ -73,9 +73,11 @@ def evaluate(test_dict_lst, args, dataset):
             # open_hit_scores['hit'].append(hit)
 
             print('##open', '##pred_value', pred_value, '##gt_value', gt_value)
-            print(calculate_appearance_with_normalization(pred_value, gt_value, candidate_set))
 
-            open_hit_scores['hit'].append(calculate_appearance_with_normalization(pred_value, gt_value, candidate_set))
+            score = calculate_appearance_with_normalization(pred_value, gt_value, candidate_set)
+            print(score)
+
+            open_hit_scores['hit'].append(score)
             open_hit_scores['q_id'].append(item['id'])
 
             exact_scores['hit'].append(calculate_exactmatch(pred_value, gt_value))
