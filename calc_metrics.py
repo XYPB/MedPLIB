@@ -117,7 +117,8 @@ def evaluate(test_dict_lst, args):
 
             if gt_value == pred_value_filtered:
                 closed_scores['hit'].append(1)
-                print('hit', pred_value, pred_value_filtered, gt_value)
+                print('hit', pred_value)
+                print(pred_value_filtered, gt_value)
             else:
                 closed_scores['hit'].append(0)
             closed_cnt += 1
