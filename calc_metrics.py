@@ -110,13 +110,14 @@ def evaluate(test_dict_lst, args):
             #     closed_scores['hit'].append(0)
 
             if args.dataset == 'VQA-RAD-yesno':
-                pred_value = filter_closed_answers(pred_value, 'yes/no')
+                pred_value_filtered = filter_closed_answers(pred_value, 'yes/no')
             else:
-                pred_value = filter_closed_answers(pred_value, 'multiple_choice')
+                pred_value_filtered = filter_closed_answers(pred_value, 'multiple_choice')
             # print('pred_value', pred_value, 'gt_value', gt_value)
 
-            if gt_value == pred_value:
+            if gt_value == pred_value_filtered:
                 closed_scores['hit'].append(1)
+                print('hit', pred_value, pred_value_filtered, gt_value)
             else:
                 closed_scores['hit'].append(0)
             closed_cnt += 1
