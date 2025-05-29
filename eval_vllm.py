@@ -419,68 +419,52 @@ def create_optimized_intern_vl_function():
         
         # Process conversations one by one with memory optimizations
         for idx, messages in tqdm(enumerate(conversations), desc="Processing with Intern-VL", total=len(conversations)):
-            try:
-                # Prepare the input
-                image_path = messages[1]['content'][1]['image']
-                
-                # Optimize image loading - reduce resolution and patches
-                image = Image.open(image_path).convert('RGB')
-                
-                # Downsample large images first
-                w, h = image.size
-                if max(w, h) > 512:
-                    scale = 512 / max(w, h)
-                    new_w, new_h = int(w * scale), int(h * scale)
-                    image = image.resize((new_w, new_h), Image.LANCZOS)
-                
-                # Use smaller input size and fewer patches
-                transform = build_transform(input_size=384)  # Reduced from 448
-                images = dynamic_preprocess(image, image_size=384, use_thumbnail=False, max_num=8)  # Reduced from 12
-                pixel_values = [transform(img) for img in images]
-                image_tensor = torch.stack(pixel_values).to(torch.bfloat16).cuda()
-                
-                # Clear intermediate variables to save memory
-                del image, images, pixel_values
-                torch.cuda.empty_cache()
-                
-                system_prompt = messages[0]["content"][0]["text"]
-                question = "<image>\n" + messages[1]['content'][0]['text']
-                message = f"INSTRUCTION: {system_prompt}\n\nQUESTION: {question}\n\nANSWER:"
+            # Prepare the input
+            image_path = messages[1]['content'][1]['image']
+            
+            # Optimize image loading - reduce resolution and patches
+            image = Image.open(image_path).convert('RGB')
+            
+            # Downsample large images first
+            w, h = image.size
+            if max(w, h) > 512:
+                scale = 512 / max(w, h)
+                new_w, new_h = int(w * scale), int(h * scale)
+                image = image.resize((new_w, new_h), Image.LANCZOS)
+            
+            # Use smaller input size and fewer patches
+            transform = build_transform(input_size=384)  # Reduced from 448
+            images = dynamic_preprocess(image, image_size=384, use_thumbnail=False, max_num=8)  # Reduced from 12
+            pixel_values = [transform(img) for img in images]
+            image_tensor = torch.stack(pixel_values).to(torch.bfloat16).cuda()
+            
+            # Clear intermediate variables to save memory
+            del image, images, pixel_values
+            torch.cuda.empty_cache()
+            
+            system_prompt = messages[0]["content"][0]["text"]
+            question = "<image>\n" + messages[1]['content'][0]['text']
+            message = f"INSTRUCTION: {system_prompt}\n\nQUESTION: {question}\n\nANSWER:"
 
-                # Generate the response
-                with torch.inference_mode():
-                    decoded = model.chat(tokenizer, image_tensor, message, generation_config)
-                    decoded = decoded.strip()
-                    
-                    # Prepare output
-                    output = {
-                        "id": image_path,
-                        "input": messages[1]["content"][0]['text'],
-                        "output": decoded,
-                        "gt": gts[idx] if idx < len(gts) else None
-                    }
-                    outputs.append(output)
+            # Generate the response
+            with torch.inference_mode():
+                decoded = model.chat(tokenizer, image_tensor, message, generation_config)
+                decoded = decoded.strip()
+                
+                # Prepare output
+                output = {
+                    "id": image_path,
+                    "input": messages[1]["content"][0]['text'],
+                    "output": decoded,
+                    "gt": gts[idx] if idx < len(gts) else None
+                }
+                outputs.append(output)
                 
                 # Clear memory after processing each sample
                 del image_tensor
                 torch.cuda.empty_cache()
                 gc.collect()
-                
-            except Exception as e:
-                print(f"Error processing image {image_path}: {e}")
-                output = {
-                    "id": image_path,
-                    "input": messages[1]["content"][0]['text'] if "content" in messages[1] else "Error retrieving input",
-                    "output": f"Error during generation: {str(e)}",
-                    "gt": gts[idx] if idx < len(gts) else None
-                }
-                outputs.append(output)
-                raise e  # Re-raise the exception to stop processing further
-                
-                # Try to recover from error
-                # torch.cuda.empty_cache()
-                # gc.collect()
-                
+
             # Extra memory cleanup between samples
             if idx % 100 == 0:  # More aggressive cleanup every 100 samples
                 print(f"Performing deep memory cleanup at sample {idx}")
