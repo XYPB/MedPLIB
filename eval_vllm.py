@@ -404,11 +404,14 @@ def eval_intern_vl(conversations, gts):
         image_path = messages[1]['content'][1]['image']
         image = load_image(image_path, max_num=12).to(torch.bfloat16).cuda()
         messages[1]['content'][1]['image'] = image
+        system_prompt = messages[0]["content"][0]["text"]
         question = "<image>\n" + messages[1]['content'][0]['text']
+
+        message = f"INSTRUCTION: {system_prompt}\n\nQUESTION: {question}\n\nANSWER:"
 
         # Generate the response
         with torch.inference_mode():
-            decoded = model.chat(tokenizer, image, question, generation_config)
+            decoded = model.chat(tokenizer, image, message, generation_config)
             decoded = decoded.strip()  # Clean up whitespace
             output = {
                 "id": image_path,
