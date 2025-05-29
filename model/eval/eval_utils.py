@@ -5,7 +5,7 @@ import math
 def filter_closed_answers(prediction, answer_type):
     # print(f"Filtering prediction: {prediction} for answer type: {answer_type}")
     prediction = prediction.lower().strip()
-    prediction = re.sub(r'[^a-zA-Z ]', '', prediction)  # Remove non-alphabetic characters
+    prediction = re.sub(r'[^a-zA-Z0-9 ]', '', prediction)  # Remove non-alphabetic characters
     prediction = prediction.split()
     if answer_type.lower() in ['yes/no', 'closed']:
         # For closed-ended questions, we only consider 'yes' or 'no' as valid answers

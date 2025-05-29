@@ -123,6 +123,7 @@ def evaluate(test_dict_lst, args):
             if gt_value == pred_value_filtered:
                 closed_scores['hit'].append(1)
                 print('hit', pred_value)
+                print(item['input'])
                 print(pred_value_filtered, gt_value)
             else:
                 closed_scores['hit'].append(0)
