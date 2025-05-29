@@ -47,7 +47,7 @@ def evaluate(test_dict_lst, args):
         else:
             pred_value = normalize_word(pred_value)
 
-        if args.dataset == 'VQA-RAD':
+        if 'VQA-RAD' in args.dataset:
             if gt_value in ['yes', 'no']:
                 eval_closed = True
                 args.dataset = 'VQA-RAD-yesno'
