@@ -12,6 +12,8 @@ def extract_answer_option(questions, gt_value):
     if match:
         matched_value = match.group(1)
         matched_value = matched_value.replace(f'{gt_value}:', '').strip()  # Remove choice label and colon
+        matched_value = re.sub(r'[^a-zA-Z0-9 ]', '', matched_value)  # Remove non-alphabetic characters
+        matched_value = matched_value.lower().strip()  # Normalize the matched value
         return matched_value
     return gt_value
 
