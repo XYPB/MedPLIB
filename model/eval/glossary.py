@@ -137,7 +137,7 @@ manual_map = {
     "nine": "9",
     "ten": "10",
 }
-articles = ["an", "the"] # skip a for multiple choice questions
+articles = ["a", "an", "the"]
 period_strip = re.compile("(?!<=\d)(\.)(?!\d)")
 comma_strip = re.compile("(\d)(\,)(\d)")
 punct = [
