@@ -1,6 +1,6 @@
 import math
-from eval_utils import *
-from glossary import *
+from .eval_utils import *
+from .glossary import *
 
 def bleu(candidate, references, n, weights):
 
