@@ -7,7 +7,7 @@ def extract_answer_option(questions, gt_value):
 
     # extract the answer option from the question
     # answer option is wrapped in gt_value: <value> \n
-    pattern = re.compile(rf'{re.escape(gt_value)}:\s*<(\w+)>\n')
+    pattern = rf"{gt_value}:(.*?)(?:\n|$)"
     match = re.search(pattern, questions)
     print(match)
     if match:
