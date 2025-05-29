@@ -426,7 +426,6 @@ def create_optimized_intern_vl_function():
             image_tensor = load_image(image_path, input_size=224, max_num=12)
             
             # Clear intermediate variables to save memory
-            del image, images, pixel_values
             torch.cuda.empty_cache()
             
             system_prompt = messages[0]["content"][0]["text"]
