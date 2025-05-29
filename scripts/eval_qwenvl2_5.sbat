@@ -24,4 +24,9 @@ git pull
 # python eval_vllm.py --model qwen --num_samples -1 --dataset "PMC-VQA"
 # python eval_vllm.py --model qwen --num_samples -1 --dataset "OmniMedVQA"
 # python eval_vllm.py --model qwen --num_samples -1 --dataset "VQA-RAD"
-python eval_vllm.py --model qwen --num_samples -1 --dataset "PVQA"
+# python eval_vllm.py --model qwen --num_samples -1 --dataset "PVQA"
+
+
+python eval_vllm.py --model internvl --num_samples -1 --dataset "PVQA" --instruct_ft
+python eval_vllm.py --model internvl --num_samples -1 --dataset "PVQA"
+python eval_vllm.py --model llava_med --num_samples -1 --dataset "PVQA"
