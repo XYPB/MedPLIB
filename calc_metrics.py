@@ -68,7 +68,7 @@ def evaluate(test_dict_lst, args, dataset):
             #     hit = 0.0
             # open_hit_scores['hit'].append(hit)
 
-            print('##pred_value', pred_value, '##gt_value', gt_value, '##candidate_set', candidate_set)
+            print('##pred_value', pred_value, '##gt_value', gt_value)
             print(calculate_appearance_with_normalization(pred_value, gt_value, candidate_set))
 
             open_hit_scores['hit'].append(calculate_appearance_with_normalization(pred_value, gt_value, candidate_set))
