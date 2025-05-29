@@ -521,6 +521,8 @@ def eval_llava_med(conversations, gts):
         question = "<image>\n" + messages[1]['content'][0]['text']
         if gts[idx] in ['A', 'B', 'C', 'D']:
             question += '\n Please just answer A, B, C, or D, no explanations.'
+        if gts[idx] in ['Yes', 'No']:
+            question += '\n Please just answer Yes or No, no explanations.'
         system_prompt = messages[0]["content"][0]["text"]
 
         conv = conv_templates['mistral_instruct'].copy()
@@ -547,7 +549,7 @@ def eval_llava_med(conversations, gts):
             outputs.append(output)
 
             # Clean up memory
-            del image_tensor, inputs
+            del image_tensor, input_ids, output_ids
             torch.cuda.empty_cache()
             gc.collect()
 
