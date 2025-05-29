@@ -108,6 +108,7 @@ def evaluate(test_dict_lst, args):
             # else:
             #     closed_scores['hit'].append(0)
 
+            print('pred_value', pred_value)
             if args.dataset == 'VQA-RAD-yesno':
                 pred_value = filter_closed_answers(pred_value, 'yes/no')
             else:
