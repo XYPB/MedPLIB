@@ -19,7 +19,6 @@ def evaluate(test_dict_lst, args):
 
     candidate_set = []
     for item in test_dict_lst:
-        print(item)
         candidate_set.append(item['gt'])
     
     print(len(candidate_set))
