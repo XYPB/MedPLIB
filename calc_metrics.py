@@ -194,5 +194,5 @@ if __name__ == "__main__":
     if len(test_dict_lst) == 0:
         print('No predictions found in the file.')
     else:
-        result = evaluate(test_dict_lst, args)
+        result = evaluate(test_dict_lst, args, dataset)
         print(result)
