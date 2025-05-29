@@ -11,10 +11,9 @@ from nltk.translate.bleu_score import sentence_bleu
 
 parser = argparse.ArgumentParser()
 parser.add_argument('--pred', type=str, default="answer-file-medplib-zeorshot.jsonl", help='path to prediction file')
-parser.add_argument("--dataset", type=str, default="MeCoVQA", help="Dataset to evaluate on (default: MeCoVQA)")
 
 
-def evaluate(test_dict_lst, args):
+def evaluate(test_dict_lst, args, dataset):
     print('pred file', args.pred)
 
     candidate_set = []
@@ -52,15 +51,15 @@ def evaluate(test_dict_lst, args):
         else:
             pred_value = normalize_word(pred_value)
 
-        if 'VQA-RAD' in args.dataset:
+        if 'VQA-RAD' in dataset:
             if gt_value in ['yes', 'no']:
                 eval_closed = True
-                args.dataset = 'VQA-RAD-yesno'
+                dataset = 'VQA-RAD-yesno'
             else:
                 eval_open = True
-                args.dataset = 'VQA-RAD-open'
+                dataset = 'VQA-RAD-open'
 
-        if args.dataset in ['MeCoVQA', 'VQA-RAD-open']:
+        if dataset in ['MeCoVQA', 'VQA-RAD-open']:
             eval_open = True
             # for open-ended question
             # if gt_value in pred_value:
@@ -102,7 +101,7 @@ def evaluate(test_dict_lst, args):
             bleu_scores['bleu_score_3'].append(b_score_3)
             open_cnt += 1
 
-        elif args.dataset in ['PMC-VQA', 'OmniMedVQA', 'VQA-RAD-yesno']:
+        elif dataset in ['PMC-VQA', 'OmniMedVQA', 'VQA-RAD-yesno']:
             eval_closed = True
             # for close-ended question (Yes/No)
             closed_scores['q_id'].append(item['id'])
@@ -115,7 +114,7 @@ def evaluate(test_dict_lst, args):
             #     closed_scores['hit'].append(0)
 
 
-            if args.dataset == 'VQA-RAD-yesno':
+            if dataset == 'VQA-RAD-yesno':
                 pred_value_filtered = filter_closed_answers(pred_value, 'yes/no')
                 gt_option = gt_value.lower().strip()
             else:
@@ -190,6 +189,7 @@ if __name__ == "__main__":
     test_dict_lst = json.load(open(args.pred, 'r'))['outputs']
 
     print('test_dict_lst', len(test_dict_lst))
+    dataset = args.pred.split('/')[-1].split('_')[3]
 
     if len(test_dict_lst) == 0:
         print('No predictions found in the file.')
