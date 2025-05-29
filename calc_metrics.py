@@ -120,7 +120,7 @@ def evaluate(test_dict_lst, args, dataset):
             bleu_scores['bleu_score_3'].append(b_score_3)
             open_cnt += 1
 
-        elif dataset in ['PMC-VQA', 'OmniMedVQA', 'VQA-RAD-yesno', 'PVQA-closed']:
+        elif dataset in ['PMC-VQA', 'OmniMedVQA', 'VQA-RAD-yesno', 'PVQA-yesno', 'PVQA-number']:
             eval_closed = True
             # for close-ended question (Yes/No)
             closed_scores['q_id'].append(item['id'])
