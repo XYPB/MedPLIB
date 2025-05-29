@@ -423,7 +423,7 @@ def create_optimized_intern_vl_function():
             image_path = messages[1]['content'][1]['image']
             
             # Optimize image loading - reduce resolution and patches
-            image_tensor = load_image(image_path, input_size=224, max_num=12)
+            image_tensor = load_image(image_path, input_size=224, max_num=12).to(model.device, dtype=torch.bfloat16)
             
             # Clear intermediate variables to save memory
             torch.cuda.empty_cache()
