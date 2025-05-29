@@ -450,7 +450,7 @@ def eval_llava_med(conversations, gts):
         conv.append_message(conv.roles[0], question)
         conv.append_message(conv.roles[1], None)  # Placeholder for the model's response
         prompt = conv.get_prompt()
-        print(prompt)
+        # print(prompt)
 
         # Generate the response
         with torch.inference_mode():
