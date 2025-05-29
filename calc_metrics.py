@@ -40,7 +40,7 @@ def evaluate(test_dict_lst, args, dataset):
     closed_cnt = 0
     for item in tqdm(test_dict_lst):
         gt_value = str(item['gt']).lower()
-        pred_value = item['output'].lower()
+        pred_value = str(item['output']).lower()
 
 
         if item['gt'] == 'A':
