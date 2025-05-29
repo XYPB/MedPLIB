@@ -1,6 +1,7 @@
 import torch
 import json
 import os
+import gc
 import datetime
 from PIL import Image
 import torchvision.transforms as T
@@ -388,7 +389,6 @@ def eval_intern_vl(conversations, gts, instruct_ft=False):
     """
     Memory-optimized version of the InternVL evaluation function
     """
-    import gc
     if instruct_ft:
         path = "OpenGVLab/InternVL3-8B-Instruct"
     else:
@@ -479,7 +479,7 @@ def eval_llava_med(conversations, gts):
         image = Image.open(image_path).resize((224, 224)).convert('RGB')
         image_tensor = image_processor(images=image, return_tensors="pt").pixel_values.to(model.device, dtype=model.dtype)
         messages[1]['content'][1]['image'] = image
-        question = "<image>\n" + messages[1]['content'][0]['text'] + '\n Please just answer A, B, C, or D, no need for explanations.'
+        question = "<image>\n" + messages[1]['content'][0]['text'] + '\n Please just answer A, B, C, or D, no explanations.'
         system_prompt = messages[0]["content"][0]["text"]
 
         conv = conv_templates['mistral_instruct'].copy()
@@ -509,6 +509,11 @@ def eval_llava_med(conversations, gts):
                 "gt": gts[idx] if idx < len(gts) else None
             }
             outputs.append(output)
+
+            # Clean up memory
+            del image_tensor, inputs
+            torch.cuda.empty_cache()
+            gc.collect()
 
     return outputs
 
