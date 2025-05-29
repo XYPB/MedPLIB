@@ -145,7 +145,7 @@ def evaluate(test_dict_lst, args, dataset):
                 # extract answer value for multiple choice questions
                 gt_option = extract_answer_option(item['input'], gt_value)
 
-            # print('pred_value', pred_value, 'gt_value', gt_value)
+            print('pred_value', pred_value, 'gt_value', gt_value)
             # print('##gt_option', gt_option, '##pred_value', pred_value)
             if gt_value == pred_value_filtered or gt_option in pred_value:
                 closed_scores['hit'].append(1)
