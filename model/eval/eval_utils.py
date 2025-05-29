@@ -3,7 +3,7 @@ import re
 import math
 
 def filter_closed_answers(prediction, answer_type):
-    print(f"Filtering prediction: {prediction} for answer type: {answer_type}")
+    # print(f"Filtering prediction: {prediction} for answer type: {answer_type}")
     prediction = prediction.lower().strip()
     prediction = re.sub(r'[^a-zA-Z ]', '', prediction)  # Remove non-alphabetic characters
     prediction = prediction.split()
@@ -14,7 +14,7 @@ def filter_closed_answers(prediction, answer_type):
         return prediction.strip() if prediction else ''  # Default to '' if no valid answer found
     elif answer_type.lower() in ['multiple_choice', 'mcq']:
         # For open-ended questions, we return the prediction as is
-        print(prediction)
+        # print(prediction)
         prediction = [word for word in prediction if word in ['a', 'b', 'c', 'd', 'e']]  # Remove empty strings
         prediction = ''.join(prediction).strip()  # Join the remaining words
         return prediction if prediction else ''  # Default to '' if no valid answer found
