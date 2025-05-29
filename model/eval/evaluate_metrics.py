@@ -82,6 +82,10 @@ def calculate_appearance_with_normalization(prediction, reference, candidate_set
 
     prediction = normalize_word(prediction)
     reference = normalize_word(reference)
+
+    if reference in prediction:
+        return 1.0
+
     prediction_words = split_sentence(prediction, 1)
     reference_words = split_sentence(reference, 1)
 
@@ -98,7 +102,7 @@ def calculate_appearance_with_normalization(prediction, reference, candidate_set
 
     final_prediction = candidate_answer_normalized_list[argmax(similarity_list)]
 
-    print('##final_predictionss', final_prediction)
+    print('##final_prediction ', final_prediction)
 
     # import pdb; pdb.set_trace()
 

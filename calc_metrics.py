@@ -130,7 +130,7 @@ def evaluate(test_dict_lst, args, dataset):
             if gt_value == pred_value_filtered or gt_option in pred_value:
                 closed_scores['hit'].append(1)
             else:
-                print('##close', '##pred_value', pred_value, '##gt_value', gt_value)
+                # print('##close', '##pred_value', pred_value, '##gt_value', gt_value)
                 closed_scores['hit'].append(0)
             closed_cnt += 1
     
