@@ -2,6 +2,23 @@ from collections import defaultdict
 import re
 import math
 
+def filter_closed_answers(prediction, answer_type):
+    prediction = prediction.lower().strip()
+    prediction = re.sub(r'[^a-zA-Z ]', '', prediction)  # Remove non-alphabetic characters
+    prediction = prediction.split()
+    if answer_type.lower() in ['yes/no', 'closed']:
+        # For closed-ended questions, we only consider 'yes' or 'no' as valid answers
+        prediction = [word for word in prediction if word in ['yes', 'no']]
+        prediction = 'yes' if 'yes' in prediction else 'no' if 'no' in prediction else ''
+        return prediction.strip() if prediction else ''  # Default to '' if no valid answer found
+    elif answer_type.lower() in ['multiple_choice', 'mcq']:
+        # For open-ended questions, we return the prediction as is
+        prediction = [word for word in prediction if word in ['a', 'b', 'c', 'd', 'e']]  # Remove empty strings
+        return prediction if prediction else ''  # Default to '' if no valid answer found
+    else:
+        # For other types of questions, we return the prediction as is
+        return ' '.join(prediction).strip()
+
 def brevity_penalty(candidate, references):
     c = len(candidate)
     ref_lens = (len(reference) for reference in references)
