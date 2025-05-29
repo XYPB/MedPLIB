@@ -172,7 +172,7 @@ def parse_pvqa_to_conversations(pickle_path):
         question = entry['sent']
         answer_type = entry['answer_type']
         image_path = os.path.join(PVQA_FOLDER, entry['img_id'] + '.jpg')
-        gt_output = list(entry['label'].keys())
+        gt_output = list(entry['label'].keys())[0]
 
         message = deepcopy(message_template)
         if answer_type == 'yes/no':
