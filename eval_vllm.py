@@ -506,6 +506,7 @@ def eval_llava_med(conversations, gts):
         model_base=None,
         model_name='llava-med-v1.5-mistral-7b'
     )
+    print(model.config.mm_use_im_start_end)
 
     model = model.eval().cuda()
     outputs = []
