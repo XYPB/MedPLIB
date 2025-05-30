@@ -1,6 +1,6 @@
 #!/bin/bash
 
-#SBATCH --job-name=eval_internvl3
+#SBATCH --job-name=eval_internvl3—instruct
 #SBATCH --comment="Evaluation of InternVL3_instruct"
 #SBATCH --time=2-00:00:00
 #SBATCH --mail-type=FAIL
