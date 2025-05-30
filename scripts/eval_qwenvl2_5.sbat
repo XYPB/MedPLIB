@@ -25,7 +25,3 @@ git pull
 # python eval_vllm.py --model qwen --num_samples -1 --dataset "OmniMedVQA"
 # python eval_vllm.py --model qwen --num_samples -1 --dataset "VQA-RAD"
 # python eval_vllm.py --model qwen --num_samples -1 --dataset "PVQA"
-
-
-conda activate llava-med
-python eval_vllm.py --model llava_med --num_samples -1 --dataset "PVQA"
