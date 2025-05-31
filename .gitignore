@@ -12,6 +12,8 @@ projector.log
 serve_logs
 serve_images/*
 
+wandb/
+vis_output
 data/
 tmp/
 scripts/slurm-*
