@@ -7,12 +7,12 @@ exp_dir="runs/$exp_name"
 mkdir -p "$exp_dir"
 
 TRANSFORMERS_OFFLINE=1 deepspeed --include=localhost:0,1,2,3 --master_port=64999 train_ds_medplib.py \
-  --version="/root/paddlejob/workspace/env_run/output/huangxiaoshuang/MedPLIB/runs/medplib-7b-stage2/hf" \
-  --vision_tower='/root/paddlejob/workspace/env_run/output/huangxiaoshuang/huggingface_models/clip-vit-large-patch14-336' \
-  --data_path='/root/paddlejob/workspace/env_run/data/huangxiaoshuang/jsons/MeCoVQA/MeCoVQA_train.json' \
-  --val_data_path='/root/paddlejob/workspace/env_run/data/huangxiaoshuang/jsons/MeCoVQA/MeCoVQA_Grounding_test_rand500.json' \
-  --image_folder='/tmp/v2_mnt/HCG/huangxiaoshuang/SAMed2D_v1' \
-  --vision_pretrained="/root/paddlejob/workspace/env_run/output/huangxiaoshuang/huggingface_models/sam-med2d_b.pth" \
+  --version="/home/yd344/project/MedPLIB/runs/medplib-7b-stage2_all/hf" \
+  --vision_tower='openai/clip-vit-large-patch14-336' \
+  --data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/train/MeCoVQA-Complex_local+Region_fixed.json' \
+  --val_data_path='/home/yd344/dvornek_10t/Datasets/MeCoVQA/test/MeCoVQA_Grounding_test.json' \
+  --image_folder='/home/yd344/dvornek_10t/Datasets/SA-Med2D/raw/MeCoVQA/SAMed2Dv1' \
+  --vision_pretrained="/home/yd344/palmer_scratch/huggingface_models/sam-med2d_b.pth" \
   --exp_name=$exp_name \
   --epochs=3 \
   --batch_size=4 \
