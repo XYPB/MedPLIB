@@ -1,18 +1,18 @@
 #!/bin/bash
 
 #SBATCH --job-name=MedPLIB_train
-#SBATCH --comment=Train_stage3_on_grounding_data
+#SBATCH --comment=Train_stage3_on_grounding_data_all
 #SBATCH --time=2-00:00:00
 #SBATCH --mail-type=FAIL
 #SBATCH --mail-type=END
 #SBATCH --mail-user=yuexi.du@yale.edu
 
 #SBATCH --ntasks=1
-#SBATCH --cpus-per-task=16
+#SBATCH --cpus-per-task=32
 #SBATCH --mem-per-cpu=6g
 #SBATCH --partition gpu
 #SBATCH --nodes 1
-#SBATCH --gpus a100:2
+#SBATCH --gpus a100:4
 
 cd ~/project/MedPLIB
 module load miniconda
