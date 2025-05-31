@@ -1,7 +1,7 @@
 
 time=$(date +%Y-%m-%d-%H-%M-%S)
 NCCL_DEBUG=WARN
-exp_name="medplib-7b-stage3"
+exp_name="medplib-7b-stage3_all"
 exp_dir="runs/$exp_name"
 mkdir -p "$exp_dir"
 
